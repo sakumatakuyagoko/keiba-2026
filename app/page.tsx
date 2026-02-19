@@ -177,11 +177,11 @@ export default function Home() {
         {/* Shine Effect Overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
 
-        <h1 className="text-2xl font-black tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-10 flex items-center gap-1">
+        <h1 className="text-lg font-black tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-10 flex items-center gap-1">
           鶯谷杯
           <span className="flex items-center text-yellow-400">
-            <span className="mx-1 text-3xl">🏆</span>
-            <span className="text-2xl">小倉2026</span>
+            <span className="mx-1 text-xl">🏆</span>
+            <span className="text-base">小倉2026</span>
           </span>
         </h1>
         <Link href="/login" className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors border border-white/20 z-10">

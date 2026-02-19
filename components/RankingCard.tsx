@@ -61,7 +61,7 @@ export function RankingCard({ entry, index, currentUser, className, ...props }: 
         >
             {/* Top Row */}
             <div className={clsx(
-                "flex items-stretch min-h-[50px] w-full",
+                "flex items-stretch min-h-[44px] w-full",
                 isMe ? "cursor-pointer hover:bg-yellow-50" : ""
             )}>
                 {/* 1. Waku / No */}
@@ -95,7 +95,7 @@ export function RankingCard({ entry, index, currentUser, className, ...props }: 
                     entry.returnRate > 0 ? "bg-blue-100/50 text-blue-800" :
                         entry.returnRate < 0 ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-400"
                 )}>
-                    {entry.returnRate.toFixed(1)}%
+                    {Math.round(entry.returnRate)}%
                 </div>
 
                 {/* 5. Mark */}
@@ -140,7 +140,7 @@ export function RankingCard({ entry, index, currentUser, className, ...props }: 
                             <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
                                 <div className="text-xs text-gray-500 font-bold mb-1">回収率</div>
                                 <div className={clsx("text-lg font-black font-mono", entry.returnRate >= 100 ? "text-blue-600" : "text-gray-800")}>
-                                    {entry.returnRate.toFixed(1)}%
+                                    {Math.round(entry.returnRate)}%
                                 </div>
                             </div>
                         </div>
