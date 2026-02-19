@@ -46,7 +46,7 @@ export function NewsTicker({ bets, users }: NewsTickerProps) {
                     {isWin ? "WIN!" : ""}
                 </span>
                 <span className={isWin ? "text-yellow-400" : "text-gray-400"}>
-                    ({profit > 0 ? "+" : ""}{profit}円)
+                    {profit > 0 ? "+" : ""}{profit.toLocaleString()}円
                 </span>
             </div>
         );
