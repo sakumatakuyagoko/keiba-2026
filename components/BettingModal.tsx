@@ -170,14 +170,14 @@ export function BettingModal({ isOpen, onClose, onSubmit }: BettingModalProps) {
                             {/* Race Selector */}
                             <div className="space-y-2">
                                 <label className="text-xs text-white/50 uppercase">レース場・R</label>
-                                <div className="flex gap-1 p-1 bg-gray-800 rounded-xl">
+                                <div className="flex gap-2 p-1 bg-gray-800 rounded-xl">
                                     {(["Kokura", "Tokyo", "Hanshin"] as const).map(loc => (
                                         <button
                                             key={loc}
                                             onClick={() => setSelectedLocation(loc)}
                                             className={clsx(
-                                                "flex-1 py-2 text-xs font-bold rounded-lg transition-colors",
-                                                selectedLocation === loc ? "bg-white text-black" : "text-white/50 hover:text-white"
+                                                "flex-1 py-4 text-lg font-black rounded-lg transition-colors",
+                                                selectedLocation === loc ? "bg-white text-black shadow-lg transform scale-105" : "text-white/50 hover:text-white hover:bg-white/5"
                                             )}
                                         >
                                             {loc === "Kokura" ? "小倉" : loc === "Tokyo" ? "東京" : "阪神"}
@@ -217,29 +217,27 @@ export function BettingModal({ isOpen, onClose, onSubmit }: BettingModalProps) {
                                 </div>
                             </div>
 
-                            {/* Amounts */}
-                            <div className="space-y-4">
+                            {/* Amounts - Side by Side */}
+                            <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
                                     <label className="text-xs text-white/50 uppercase">投資額 (円)</label>
                                     <input
-                                        type="number"
-                                        inputMode="numeric"
+                                        type="tel"
                                         pattern="[0-9]*"
                                         value={investment}
                                         onChange={(e) => setInvestment(e.target.value)}
-                                        className="w-full bg-gray-800 text-white text-2xl font-mono p-3 rounded-xl border border-white/10 focus:border-yellow-500 outline-none placeholder:text-gray-700"
+                                        className="w-full bg-gray-800 text-white text-2xl font-mono p-3 rounded-xl border border-white/10 focus:border-yellow-500 outline-none placeholder:text-gray-700 text-center"
                                         placeholder="0"
                                     />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-xs text-white/50 uppercase">回収額 (円)</label>
                                     <input
-                                        type="number"
-                                        inputMode="numeric"
+                                        type="tel"
                                         pattern="[0-9]*"
                                         value={returnAmount}
                                         onChange={(e) => setReturnAmount(e.target.value)}
-                                        className="w-full bg-gray-800 text-white text-2xl font-mono p-3 rounded-xl border border-white/10 focus:border-green-500 outline-none placeholder:text-gray-700"
+                                        className="w-full bg-gray-800 text-white text-2xl font-mono p-3 rounded-xl border border-white/10 focus:border-green-500 outline-none placeholder:text-gray-700 text-center"
                                         placeholder="0"
                                     />
                                 </div>

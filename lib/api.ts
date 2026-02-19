@@ -48,13 +48,17 @@ export async function fetchBets(): Promise<Bet[]> {
 
 // Log to Google Sheet via GAS Web App
 async function logToSheet(bet: Omit<Bet, 'id' | 'timestamp'> & { user_name?: string }) {
-    if (!GAS_URL) return;
+    if (!GAS_URL) {
+        console.warn("GAS_URL is not defined");
+        return;
+    }
     try {
+        console.log("Sending to GAS...", bet);
         await fetch(GAS_URL, {
             method: "POST",
             mode: "no-cors",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "text/plain", // Important for GAS no-cors
             },
             body: JSON.stringify({
                 ...bet,
@@ -62,6 +66,7 @@ async function logToSheet(bet: Omit<Bet, 'id' | 'timestamp'> & { user_name?: str
                 userId: bet.user_name || bet.userId // Send Name if available, otherwise ID
             }),
         });
+        console.log("Request sent to GAS (no-cors opaque response)");
     } catch (e) {
         console.error("Failed to log to sheet", e);
     }
