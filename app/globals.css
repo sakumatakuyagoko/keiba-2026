@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent-yellow: #FFD700;
+  --color-dark-bg: #1a1a1a;
+  --color-card-bg: #2d2d2d;
+}
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 20, 20, 20;
+}
+
+body {
+  color: white;
+  background-color: #000;
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+}
