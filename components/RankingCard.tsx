@@ -69,15 +69,18 @@ export function RankingCard({ entry, index, currentUser, className, ...props }: 
                     {horseNumber}
                 </div>
 
-                {/* 2. Name & Jockey (Single Line) */}
-                <div className="flex-1 px-3 flex items-center border-r border-gray-300 min-w-0 transition-colors relative">
-                    <div className="font-bold text-black text-lg truncate w-full flex items-center gap-2">
-                        <span className="truncate">{entry.name} <span className="text-base">【{entry.jockey}】</span></span>
-                        {isMe && (
-                            <span className="shrink-0 text-xs bg-yellow-100 text-yellow-800 border border-yellow-500 px-1 rounded flex items-center">
-                                YOU {isExpanded ? <ChevronUp className="w-3 h-3 ml-1" /> : <ChevronDown className="w-3 h-3 ml-1" />}
-                            </span>
-                        )}
+                {/* 2. Name & Jockey (Two Lines) */}
+                <div className="flex-1 px-2 flex items-center border-r border-gray-300 min-w-0 transition-colors relative py-1">
+                    <div className="flex flex-col justify-center w-full min-w-0 leading-tight">
+                        <div className="flex items-center gap-1">
+                            <span className="font-bold text-black text-sm truncate">{entry.name}</span>
+                            {isMe && (
+                                <span className="shrink-0 text-[10px] bg-yellow-100 text-yellow-800 border border-yellow-500 px-1 rounded flex items-center h-4">
+                                    YOU {isExpanded ? <ChevronUp className="w-2 h-2 ml-0.5" /> : <ChevronDown className="w-2 h-2 ml-0.5" />}
+                                </span>
+                            )}
+                        </div>
+                        <span className="text-xs text-gray-600 truncate">【{entry.jockey}】</span>
                     </div>
                 </div>
 

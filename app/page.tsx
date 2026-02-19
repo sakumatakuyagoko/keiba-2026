@@ -178,15 +178,15 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
 
         <h1 className="text-2xl font-black tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-10 flex items-center gap-1">
-          鶯谷カップ
+          鶯谷杯
           <span className="flex items-center text-yellow-400">
             <span className="mx-1 text-3xl">🏆</span>
             <span className="text-2xl">小倉2026</span>
           </span>
         </h1>
-        <Link href="/login" className="flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors border border-white/20 z-10">
-          <UserIcon className="w-4 h-4 text-yellow-500" />
-          <span className="text-xs font-bold truncate max-w-[100px]">
+        <Link href="/login" className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors border border-white/20 z-10">
+          <UserIcon className="w-5 h-5 text-yellow-500" />
+          <span className="text-sm font-bold truncate max-w-[120px]">
             {currentUser ? currentUser.name : "ログイン"}
           </span>
         </Link>
