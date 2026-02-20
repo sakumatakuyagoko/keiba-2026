@@ -135,7 +135,7 @@ export function RankingCard({ entry, index, currentUser, className, onEditBet, l
                                 <div className="relative z-10">
                                     <div className="text-xs text-gray-500 font-bold mb-1">総投資額</div>
                                     <div className="text-lg font-black font-mono text-gray-800">
-                                        {entry.isKing ? "******" : `¥${entry.totalInvestment.toLocaleString()}`}
+                                        {entry.isKing && !isMe ? "******" : `¥${entry.totalInvestment.toLocaleString()}`}
                                     </div>
                                 </div>
                             </div>

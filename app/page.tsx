@@ -114,10 +114,17 @@ export default function Home() {
     const validBets = Array.from(latestBetsMap.values());
 
     // 2. Calculate Stats
+    // Helper to safely parse numbers (handle "300,000" strings)
+    const cleanNumber = (val: any) => {
+      if (typeof val === 'number') return val;
+      if (typeof val === 'string') return Number(val.replace(/,/g, ''));
+      return 0;
+    };
+
     const statsEntries: LeaderboardEntry[] = users.map((user) => {
       const userBets = validBets.filter((b) => b.userId === user.id);
-      const totalInvestment = userBets.reduce((sum, b) => sum + Number(b.investment || 0), 0);
-      const totalReturn = userBets.reduce((sum, b) => sum + Number(b.returnAmount || 0), 0);
+      const totalInvestment = userBets.reduce((sum, b) => sum + cleanNumber(b.investment), 0);
+      const totalReturn = userBets.reduce((sum, b) => sum + cleanNumber(b.returnAmount), 0);
       const netProfit = totalReturn - totalInvestment;
 
       // User Request: 100% baseline. 0/1000 -> 0%. 1000/1000 -> 100%.
@@ -250,8 +257,12 @@ export default function Home() {
         const third = sorted[2];
 
         // Investment King
+        // Use local sort to find king for ticker (robust calculation again if needed, or rely on leaderboard)
+        // But leaderboard update acts on state, which might be async. 
+        // Safer to recalculate max from current leaderboard state if available.
         const king = [...leaderboard].sort((a, b) => b.totalInvestment - a.totalInvestment)[0];
 
+        // Format: 投資王 [Name]さん（投資王） -> Hide amount for everyone in ticker
         return `全投票締め切り。結果確定しました。　　優勝 ${first?.name || "-"} さん（${Math.round(first?.returnRate || 0)}％）　　準優勝 ${second?.name || "-"} さん（${Math.round(second?.returnRate || 0)}％）　　３位 ${third?.name || "-"} さん（${Math.round(third?.returnRate || 0)}％）　　投資王 ${king?.name || "-"}さん（投資王）　でした。おめでとうございます！`;
       })()} />
 
