@@ -276,7 +276,9 @@ export default function LoginPage() {
 
                         {/* Jockey */}
                         <div className="space-y-2">
-                            <label className="text-sm text-yellow-500 font-bold">ジョッキー (苗字)</label>
+                            <label className="text-sm text-yellow-500 font-bold">
+                                ジョッキー (苗字) <span className="text-xs text-red-400 font-normal">※変更不可</span>
+                            </label>
                             <div className="p-3 bg-black/40 text-gray-300 font-bold rounded-lg border border-white/10">
                                 {selectedUser.jockey}
                             </div>
@@ -285,7 +287,9 @@ export default function LoginPage() {
                         {/* Password / Login */}
                         {mode === "login" ? (
                             <div className="space-y-2">
-                                <label className="text-sm text-yellow-500 font-bold">パスワード</label>
+                                <label className="text-sm text-yellow-500 font-bold">
+                                    パスワード <span className="text-xs text-white/70 font-normal">※半角数字4ケタ</span>
+                                </label>
                                 <div className="flex gap-2">
                                     <input
                                         type="password"
