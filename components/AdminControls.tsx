@@ -39,8 +39,8 @@ export function AdminControls({ isAdmin, onLogin, onLogout }: AdminControlsProps
 
     if (isAdmin) {
         return (
-            <div className="fixed bottom-4 left-4 right-4 z-40 flex flex-col gap-2 animate-in slide-in-from-bottom-4">
-                <div className="bg-red-900/90 text-white p-4 rounded-xl border border-red-500 shadow-xl backdrop-blur-md">
+            <div className="fixed bottom-4 left-4 right-20 z-40 flex flex-col gap-2 animate-in slide-in-from-bottom-4 pointer-events-none">
+                <div className="bg-red-900/90 text-white p-4 rounded-xl border border-red-500 shadow-xl backdrop-blur-md pointer-events-auto max-w-sm">
                     <div className="flex justify-between items-center mb-2">
                         <span className="font-bold flex items-center gap-2">
                             🔧 管理者モード中

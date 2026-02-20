@@ -129,28 +129,40 @@ export function RankingCard({ entry, index, currentUser, className, onEditBet, .
                         }}
                     >
                         <div className="p-4 grid grid-cols-2 gap-4 border-t border-gray-200 shadow-inner cursor-pointer hover:bg-gray-100 transition-colors">
-                            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                                <div className="text-xs text-gray-500 font-bold mb-1">総投資額</div>
-                                <div className="text-lg font-black font-mono text-gray-800">
-                                    ¥{entry.totalInvestment.toLocaleString()}
+                            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-gray-100 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+                                <div className="relative z-10">
+                                    <div className="text-xs text-gray-500 font-bold mb-1">総投資額</div>
+                                    <div className="text-lg font-black font-mono text-gray-800">
+                                        ¥{entry.totalInvestment.toLocaleString()}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                                <div className="text-xs text-gray-500 font-bold mb-1">総回収額</div>
-                                <div className="text-lg font-black font-mono text-green-700">
-                                    ¥{entry.totalReturn.toLocaleString()}
+                            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+                                <div className="relative z-10">
+                                    <div className="text-xs text-gray-500 font-bold mb-1">総回収額</div>
+                                    <div className="text-lg font-black font-mono text-blue-600">
+                                        ¥{entry.totalReturn.toLocaleString()}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                                <div className="text-xs text-gray-500 font-bold mb-1">収益</div>
-                                <div className={clsx("text-lg font-black font-mono", entry.netProfit >= 0 ? "text-blue-600" : "text-red-500")}>
-                                    ¥{entry.netProfit.toLocaleString()}
+                            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                                <div className={clsx("absolute top-0 right-0 w-16 h-16 rounded-bl-full -mr-8 -mt-8 z-0", entry.netProfit >= 0 ? "bg-blue-50" : "bg-red-50")}></div>
+                                <div className="relative z-10">
+                                    <div className="text-xs text-gray-500 font-bold mb-1">収益</div>
+                                    <div className={clsx("text-lg font-black font-mono", entry.netProfit >= 0 ? "text-blue-600" : "text-red-500")}>
+                                        ¥{entry.netProfit.toLocaleString()}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                                <div className="text-xs text-gray-500 font-bold mb-1">回収率</div>
-                                <div className={clsx("text-lg font-black font-mono", entry.returnRate >= 100 ? "text-blue-600" : "text-gray-800")}>
-                                    {Math.round(entry.returnRate)}%
+                            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                                <div className={clsx("absolute top-0 right-0 w-16 h-16 rounded-bl-full -mr-8 -mt-8 z-0", entry.returnRate >= 100 ? "bg-blue-50" : "bg-gray-100")}></div>
+                                <div className="relative z-10">
+                                    <div className="text-xs text-gray-500 font-bold mb-1">回収率</div>
+                                    <div className={clsx("text-lg font-black font-mono", entry.returnRate >= 100 ? "text-blue-600" : "text-gray-800")}>
+                                        {Math.round(entry.returnRate)}%
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -159,37 +171,87 @@ export function RankingCard({ entry, index, currentUser, className, onEditBet, .
                         <div className="p-4 border-t border-gray-200">
                             <h3 className="text-xs font-bold text-gray-500 mb-2 uppercase">戦績履歴 (クリックして修正)</h3>
                             <div className="space-y-2">
-                                {history.map((bet) => {
-                                    const race = MOCK_RACES.find(r => r.id === bet.raceId);
-                                    let raceName = bet.raceId;
-                                    if (race) {
-                                        const locName = race.location === "Kokura" ? "小倉" : race.location === "Tokyo" ? "東京" : "阪神";
-                                        raceName = `${locName}${race.raceNumber}R`;
-                                    }
-                                    const profit = bet.returnAmount - bet.investment;
+                                {(() => {
+                                    // 1. Deduplicate (Keep latest per raceId)
+                                    const latestBets = new Map<string, Bet>();
+                                    history.forEach(bet => {
+                                        const existing = latestBets.get(bet.raceId);
+                                        if (!existing || new Date(bet.timestamp) > new Date(existing.timestamp)) {
+                                            latestBets.set(bet.raceId, bet);
+                                        }
+                                    });
 
-                                    return (
-                                        <div
-                                            key={bet.id}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onEditBet?.(bet);
-                                            }}
-                                            className="bg-white p-2 rounded-lg border border-gray-200 flex justify-between items-center text-sm hover:bg-yellow-50 cursor-pointer"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-bold bg-gray-100 px-2 py-0.5 rounded text-xs">{raceName}</span>
-                                                <span className="text-gray-500 text-xs">{new Date(bet.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    // 2. Sort by Race Time (asc)
+                                    const sortedHistory = Array.from(latestBets.values()).sort((a, b) => {
+                                        const rA = MOCK_RACES.find(r => r.id === a.raceId);
+                                        const rB = MOCK_RACES.find(r => r.id === b.raceId);
+                                        if (!rA || !rB) return 0;
+
+                                        // Compare Times "HH:MM"
+                                        const timeA = rA.startTime || "00:00";
+                                        const timeB = rB.startTime || "00:00";
+                                        const [hA, mA] = timeA.split(":").map(Number);
+                                        const [hB, mB] = timeB.split(":").map(Number);
+                                        if (hA !== hB) return hA - hB;
+                                        return mA - mB;
+                                    });
+
+                                    return sortedHistory.map((bet) => {
+                                        const race = MOCK_RACES.find(r => r.id === bet.raceId);
+                                        let raceName = bet.raceId;
+                                        if (race) {
+                                            const locName = race.location === "Kokura" ? "小倉" : race.location === "Tokyo" ? "東京" : "阪神";
+                                            raceName = `${locName}${race.raceNumber}R`;
+                                        }
+
+                                        // Color Logic
+                                        let bgClass = "bg-white";
+                                        if (bet.returnAmount > bet.investment) bgClass = "bg-[#d0eaff] border-blue-200"; // Light Blue (Win)
+                                        else if (bet.returnAmount < bet.investment) bgClass = "bg-[#ffe4e4] border-red-200"; // Light Red (Lose)
+                                        else bgClass = "bg-white border-gray-200"; // Draw
+
+                                        return (
+                                            <div
+                                                key={bet.id}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onEditBet?.(bet);
+                                                }}
+                                                className={clsx(
+                                                    "p-3 rounded-lg border flex justify-between items-center text-sm cursor-pointer transition-colors shadow-sm",
+                                                    bgClass,
+                                                    "hover:opacity-80"
+                                                )}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className="font-bold text-gray-800 bg-white/50 px-2 py-1 rounded border border-black/5 text-xs shadow-sm shadow-black/5">
+                                                        {raceName}
+                                                    </span>
+                                                    <span className="text-gray-500 text-xs font-mono">
+                                                        {race?.startTime || ""}
+                                                    </span>
+                                                </div>
+                                                <div className="flex gap-6 font-mono text-base items-center">
+                                                    <div className="flex flex-col items-end">
+                                                        <span className="text-[10px] text-gray-500 font-sans leading-none mb-0.5">投資(円)</span>
+                                                        <span className="text-gray-800 font-bold">
+                                                            {bet.investment.toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex flex-col items-end">
+                                                        <span className="text-[10px] text-gray-500 font-sans leading-none mb-0.5">回収(円)</span>
+                                                        <span className={clsx(
+                                                            "font-black",
+                                                            bet.returnAmount > 0 ? "text-blue-600" : "text-gray-400"
+                                                        )}>
+                                                            {bet.returnAmount.toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="flex gap-4 font-mono">
-                                                <span className="text-gray-600">-{bet.investment.toLocaleString()}</span>
-                                                <span className={profit >= 0 ? "text-red-500 font-bold" : "text-blue-500"}>
-                                                    {profit > 0 ? "+" : ""}{profit.toLocaleString()}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    });
+                                })()}
                                 {history.length === 0 && (
                                     <div className="text-center text-gray-400 text-xs py-2">履歴なし</div>
                                 )}
