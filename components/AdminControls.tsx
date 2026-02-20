@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { resetBets } from "@/lib/api";
+import { resetBets, updateSystemStatus } from "@/lib/api";
 import clsx from "clsx";
 
 interface AdminControlsProps {
     isAdmin: boolean;
     onLogin: (password: string) => boolean;
     onLogout: () => void;
+    isBettingClosed?: boolean; // New prop
 }
 
-export function AdminControls({ isAdmin, onLogin, onLogout }: AdminControlsProps) {
+export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = false }: AdminControlsProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
@@ -37,6 +38,15 @@ export function AdminControls({ isAdmin, onLogin, onLogout }: AdminControlsProps
         }
     };
 
+    const handleToggleClose = async () => {
+        const action = isBettingClosed ? "再開" : "締切";
+        if (confirm(`全投票を${action}しますか？\n${!isBettingClosed ? "※ 結果発表モードになります" : "※ 通常モードに戻ります"}`)) {
+            await updateSystemStatus(!isBettingClosed);
+            // Parent page should listen to realtime or refresh, but we can rely on page reload or state update if implemented
+            window.location.reload();
+        }
+    };
+
     if (isAdmin) {
         return (
             <div className="fixed bottom-4 left-4 right-20 z-40 flex flex-col gap-2 animate-in slide-in-from-bottom-4 pointer-events-none">
@@ -56,12 +66,25 @@ export function AdminControls({ isAdmin, onLogin, onLogout }: AdminControlsProps
                         ・全レースの投票ロックが解除されています<br />
                         ・「データ初期化」で練習データを消去できます
                     </div>
-                    <button
-                        onClick={handleReset}
-                        className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg shadow-sm"
-                    >
-                        ⚠️ データ初期化 (リセット)
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleToggleClose}
+                            className={clsx(
+                                "flex-1 font-bold py-3 rounded-lg shadow-sm text-sm border-2",
+                                isBettingClosed
+                                    ? "bg-white text-black border-white hover:bg-gray-200"
+                                    : "bg-black text-yellow-500 border-yellow-500 hover:bg-gray-900"
+                            )}
+                        >
+                            {isBettingClosed ? "投票再開" : "🏁 全締切 (結果発表)"}
+                        </button>
+                        <button
+                            onClick={handleReset}
+                            className="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg shadow-sm text-sm"
+                        >
+                            ⚠️ 初期化
+                        </button>
+                    </div>
                 </div>
             </div>
         );

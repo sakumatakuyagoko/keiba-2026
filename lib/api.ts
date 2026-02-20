@@ -132,3 +132,35 @@ export async function resetBets() {
 
     return { error: deleteError };
 }
+
+// System Status API
+export async function fetchSystemStatus() {
+    if (useMock) return { isBettingClosed: false };
+
+    const { data, error } = await supabase
+        .from('system_settings')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+    if (error) {
+        console.error("Error fetching system status:", error);
+        return { isBettingClosed: false }; // Default
+    }
+
+    return { isBettingClosed: data.is_betting_closed };
+}
+
+export async function updateSystemStatus(isClosed: boolean) {
+    if (useMock) {
+        console.log("Mock System Status Updated:", isClosed);
+        return { error: null };
+    }
+
+    const { error } = await supabase
+        .from('system_settings')
+        .update({ is_betting_closed: isClosed, updated_at: new Date().toISOString() })
+        .eq('id', 1);
+
+    return { error };
+}
