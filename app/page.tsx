@@ -229,17 +229,17 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#004d25] text-white font-sans">
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#002812] via-[#00401b] to-[#002812] p-4 border-b border-[#001a0a] flex justify-between items-center relative shadow-xl overflow-hidden">
+      <header className="bg-gradient-to-r from-[#002812] via-[#00401b] to-[#002812] px-4 py-1 border-b border-[#001a0a] flex justify-between items-center relative shadow-xl overflow-hidden min-h-[64px]">
         {/* Shine Effect Overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
 
-        <h1 className="z-10 flex items-center">
+        <h1 className="z-10 flex items-center h-full">
           <Image
             src="/logo.png"
             alt="鶯谷杯"
-            width={240}
-            height={48}
-            className="h-12 w-auto object-contain"
+            width={320}
+            height={64}
+            className="h-16 w-auto object-contain"
           />
         </h1>
         <Link href="/login" className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors border border-white/20 z-10">
