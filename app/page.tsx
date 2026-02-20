@@ -229,7 +229,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#004d25] text-white font-sans">
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#002812] via-[#00401b] to-[#002812] px-4 py-1 border-b border-[#001a0a] flex justify-between items-center relative shadow-xl overflow-hidden min-h-[72px]">
+      <header className="bg-gradient-to-r from-[#002812] via-[#00401b] to-[#002812] pl-1 pr-4 py-1 border-b border-[#001a0a] flex justify-between items-center relative shadow-xl overflow-hidden min-h-[72px]">
         {/* Shine Effect Overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
 
