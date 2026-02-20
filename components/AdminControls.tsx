@@ -39,8 +39,11 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
     };
 
     const handleToggleClose = async () => {
-        const action = isBettingClosed ? "再開" : "締切";
-        if (confirm(`全投票を${action}しますか？\n${!isBettingClosed ? "※ 結果発表モードになります" : "※ 通常モードに戻ります"}`)) {
+        const message = !isBettingClosed
+            ? "全投票を締め切りますか？\n＊結果発表モードになります"
+            : "通常モードに戻りますか？\n＊戦績結果・変更が可能となります";
+
+        if (confirm(message)) {
             await updateSystemStatus(!isBettingClosed);
             // Parent page should listen to realtime or refresh, but we can rely on page reload or state update if implemented
             window.location.reload();
@@ -67,17 +70,30 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
                         ・「データ初期化」で練習データを消去できます
                     </div>
                     <div className="flex gap-2">
-                        <button
-                            onClick={handleToggleClose}
-                            className={clsx(
-                                "flex-1 font-bold py-3 rounded-lg shadow-sm text-sm border-2",
-                                isBettingClosed
-                                    ? "bg-white text-black border-white hover:bg-gray-200"
-                                    : "bg-black text-yellow-500 border-yellow-500 hover:bg-gray-900"
-                            )}
-                        >
-                            {isBettingClosed ? "投票再開" : "🏁 全締切 (結果発表)"}
-                        </button>
+                        <div className="flex bg-gray-800 rounded-lg p-1 border border-white/10">
+                            <button
+                                onClick={() => isBettingClosed && handleToggleClose()}
+                                className={clsx(
+                                    "flex-1 py-2 rounded-md text-sm font-bold transition-all",
+                                    !isBettingClosed
+                                        ? "bg-green-600 text-white shadow-md"
+                                        : "text-gray-400 hover:text-white"
+                                )}
+                            >
+                                投票受付中
+                            </button>
+                            <button
+                                onClick={() => !isBettingClosed && handleToggleClose()}
+                                className={clsx(
+                                    "flex-1 py-2 rounded-md text-sm font-bold transition-all",
+                                    isBettingClosed
+                                        ? "bg-red-600 text-white shadow-md"
+                                        : "text-gray-400 hover:text-white"
+                                )}
+                            >
+                                ⛔ 締切 (結果)
+                            </button>
+                        </div>
                         <button
                             onClick={handleReset}
                             className="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg shadow-sm text-sm"

@@ -305,8 +305,15 @@ export default function Home() {
         onLogin={async (pass) => {
           if (pass === "1155") {
             setIsAdmin(true);
+
             const u = await fetchUsers();
-            setUsers(u);
+            // Sort by ORDERED_JOCKEYS (Fixed order)
+            const sortedUsers = u.sort((a, b) => {
+              const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
+              const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
+              return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+            });
+            setUsers(sortedUsers);
             const b = await fetchBets();
             setBets(b);
             const { fetchSystemStatus } = await import("@/lib/api");
