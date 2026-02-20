@@ -30,6 +30,7 @@ export default function Home() {
   // Admin State
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingBet, setEditingBet] = useState<Bet | null>(null);
+  const [lastBetUpdate, setLastBetUpdate] = useState<number>(Date.now());
 
   // Load User from LocalStorage on mount
   useEffect(() => {
@@ -173,6 +174,7 @@ export default function Home() {
       const newBet: Bet = { id: Math.random().toString(), ...newBetData, timestamp: new Date().toISOString() };
       setBets(prev => [...prev, newBet]);
     }
+    setLastBetUpdate(Date.now());
   };
 
   const handleEditBet = (bet: Bet) => {
@@ -243,6 +245,7 @@ export default function Home() {
               index={index}
               currentUser={currentUser}
               onEditBet={handleEditBet}
+              lastBetUpdate={lastBetUpdate}
             />
           ))}
         </AnimatePresence>

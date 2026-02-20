@@ -11,8 +11,10 @@ import { MOCK_RACES } from "@/lib/mock";
 interface RankingCardProps extends HTMLMotionProps<"div"> {
     entry: LeaderboardEntry;
     index: number;
+    index: number;
     currentUser: User | null;
     onEditBet?: (bet: Bet) => void;
+    lastBetUpdate?: number;
 }
 
 // JRA Colors
@@ -40,7 +42,7 @@ const getWakuColorClass = (horseNumber: number) => {
     return "bg-gray-500";
 };
 
-export function RankingCard({ entry, index, currentUser, className, onEditBet, ...props }: RankingCardProps) {
+export function RankingCard({ entry, index, currentUser, className, onEditBet, lastBetUpdate, ...props }: RankingCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const horseNumber = index + 1;
     const wakuClass = getWakuColorClass(horseNumber);
@@ -55,7 +57,7 @@ export function RankingCard({ entry, index, currentUser, className, onEditBet, .
         if (isExpanded && isMe) {
             fetchUserBets(entry.id).then(setHistory);
         }
-    }, [isExpanded, isMe, entry.id]);
+    }, [isExpanded, isMe, entry.id, lastBetUpdate]);
 
     return (
         <motion.div
