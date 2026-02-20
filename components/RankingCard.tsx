@@ -11,7 +11,6 @@ import { MOCK_RACES } from "@/lib/mock";
 interface RankingCardProps extends HTMLMotionProps<"div"> {
     entry: LeaderboardEntry;
     index: number;
-    index: number;
     currentUser: User | null;
     onEditBet?: (bet: Bet) => void;
     lastBetUpdate?: number;
