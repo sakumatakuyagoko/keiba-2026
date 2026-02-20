@@ -12,29 +12,7 @@ interface NewsTickerProps {
 }
 
 export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
-    // If custom message (Result Announcement) is set, show only that
-    if (customMessage) {
-        return (
-            <div className="bg-black border-y-2 border-yellow-500 overflow-hidden py-2 flex relative">
-                <motion.div
-                    className="flex whitespace-nowrap px-6 text-xl font-bold text-yellow-500 shrink-0"
-                    initial={{ x: "100%" }}
-                    animate={{ x: "-100%" }}
-                    transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-                >
-                    {customMessage}
-                </motion.div>
-                {/* Duplicate for loop effect if needed, but for long text single loop is often enough or we duplicate. 
-                    Let's just use CSS marquee style or simple long duration. 
-                    For better seamless loop with random length text: */}
-                <motion.div
-                    className="flex whitespace-nowrap px-6 text-xl font-bold text-yellow-500 shrink-0 absolute top-2 left-0"
-                    initial={{ x: "100%" }} // Simple implementation might not be perfect seamless loop without measuring width.
-                // Let's stick to the previous Seamless Loop logic but for custom message
-                />
-            </div>
-        );
-    }
+
 
     // Get latest 5 bets
     const sourceBets = [...bets].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
@@ -78,8 +56,12 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
     });
 
     const renderCustomContent = () => (
-        <span className="text-yellow-400 font-bold text-xl mx-8">
-            {customMessage}
+        <span className="flex items-center">
+            {Array(3).fill(customMessage).map((msg, i) => (
+                <span key={i} className="text-yellow-400 font-bold text-xl mx-24 whitespace-nowrap">
+                    {msg}
+                </span>
+            ))}
         </span>
     );
 
@@ -90,19 +72,15 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
                 className="flex gap-12 px-6 shrink-0"
                 initial={{ x: 0 }}
                 animate={{ x: "-100%" }}
-                transition={{ repeat: Infinity, duration: customMessage ? 40 : 60, ease: "linear" }}
+                transition={{ repeat: Infinity, duration: customMessage ? 25 : 60, ease: "linear" }}
             >
                 {customMessage ? renderCustomContent() : renderBets()}
-                {customMessage ? renderCustomContent() : ""}
-                {/* Repeat custom message multiple times to fill width? 
-                    Actually, if customMessage is short, we need multiple copies.
-                */}
             </motion.div>
             <motion.div
                 className="flex gap-12 px-6 shrink-0"
                 initial={{ x: 0 }}
                 animate={{ x: "-100%" }}
-                transition={{ repeat: Infinity, duration: customMessage ? 40 : 60, ease: "linear" }}
+                transition={{ repeat: Infinity, duration: customMessage ? 25 : 60, ease: "linear" }}
             >
                 {customMessage ? renderCustomContent() : renderBets()}
             </motion.div>

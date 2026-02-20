@@ -285,7 +285,13 @@ export default function Home() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            if (isBettingClosed && !isAdmin) {
+              alert("全ての投票は締め切られました。\n結果発表をお待ちください。");
+              return;
+            }
+            setIsModalOpen(true);
+          }}
           className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold p-4 rounded-full shadow-lg flex items-center justify-center border-2 border-white"
         >
           <Plus className="w-8 h-8" />
@@ -306,6 +312,7 @@ export default function Home() {
 
       <AdminControls
         isAdmin={isAdmin}
+        isBettingClosed={isBettingClosed}
         onLogin={async (pass) => {
           if (pass === "1155") {
             setIsAdmin(true);
