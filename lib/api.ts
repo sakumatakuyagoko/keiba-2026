@@ -11,7 +11,14 @@ export async function fetchUsers(): Promise<User[]> {
 
     const { data, error } = await supabase.from('users').select('*');
     if (error) console.error('Error fetching users:', error);
-    return data || [];
+
+    // PATCH: Fix Typos in Data from DB (富田 -> 冨田) to ensure sort works
+    const patchedData = (data || []).map((u: User) => {
+        if (u.jockey === "富田") return { ...u, jockey: "冨田" };
+        return u;
+    });
+
+    return patchedData;
 }
 
 export async function updateUserPin(userId: string, newPin: string) {
