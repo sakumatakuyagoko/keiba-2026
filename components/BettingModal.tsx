@@ -3,15 +3,17 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Lock, Info } from "lucide-react";
-import { Race, User } from "@/lib/types";
+import { Race, User, Bet } from "@/lib/types";
 import { MOCK_RACES, MOCK_USERS } from "@/lib/mock";
-import { fetchUsers } from "@/lib/api";
 import clsx from "clsx";
+import { fetchUsers, fetchUserBets } from "@/lib/api";
 
 interface BettingModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (bet: { userId: string; raceId: string; investment: number; returnAmount: number }) => void;
+    isAdmin?: boolean;
+    initialData?: Bet | null;
 }
 
 // Fixed Order List
@@ -21,7 +23,7 @@ const ORDERED_NAMES = [
     "ハンケン", "アサミハズバンド", "オオクボハグルマ", "キンパチティーチャ"
 ];
 
-export function BettingModal({ isOpen, onClose, onSubmit }: BettingModalProps) {
+export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initialData }: BettingModalProps) {
     const [users, setUsers] = useState<User[]>(MOCK_USERS);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -57,27 +59,116 @@ export function BettingModal({ isOpen, onClose, onSubmit }: BettingModalProps) {
         load();
     }, []);
 
+    useEffect(() => {
+        if (isOpen && initialData && users.length > 0) {
+            // Pre-fill form from initialData
+            const u = users.find(user => user.id === initialData.userId);
+            if (u) {
+                setSelectedUser(u);
+                setCurrentUser(u); // Auto-login if editing
+            }
+
+            // Parse raceId (e.g. "k01" -> location="Kokura", num=1)
+            const r = MOCK_RACES.find(mr => mr.id === initialData.raceId);
+            if (r) {
+                setSelectedLocation(r.location);
+                setSelectedRaceNum(r.raceNumber);
+            }
+
+            setInvestment(initialData.investment.toLocaleString());
+            setReturnAmount(initialData.returnAmount.toLocaleString());
+        } else if (isOpen && !initialData) {
+            // Reset if opening fresh
+            setInvestment("");
+            setReturnAmount("");
+        }
+    }, [isOpen, initialData, users]);
+
     if (!isOpen) return null;
 
     // Get Current Race Info
     const currentRace = MOCK_RACES.find(r => r.location === selectedLocation && r.raceNumber === selectedRaceNum);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Locking Logic
+    const isLocked = (() => {
+        if (isAdmin) return false;
+        if (!currentRace?.startTime) return false;
+
+        // Parse "HH:MM" (Japan Time)
+        const [hours, minutes] = currentRace.startTime.split(":").map(Number);
+        const now = new Date();
+        // Create race date object (assuming today)
+        const raceDate = new Date();
+        raceDate.setHours(hours, minutes, 0, 0);
+
+        // If race time is NOT passed yet, lock it (Prevent accidental input before race)
+        return now < raceDate;
+    })();
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedUser) return;
+        if (isLocked) {
+            alert("このレースはまだ発走していないため報告できません。");
+            return;
+        }
 
         const raceId = currentRace?.id || `${selectedLocation.toLowerCase()}${selectedRaceNum}`;
+
+        // Duplicate Check only if not editing (or check if changed?)
+        // If initialData exists and matches current selection, skip duplicate check?
+        // Actually simplest is: if editing, we are "re-submitting", so just warn if it's a DIFFERENT new bet, 
+        // but here we are conceptually "overwriting" logic. 
+        // Let's keep duplicate check but suppress it if we are editing the SAME race/user.
+
+        // But for now, let's keep it simple. If editing, we allow re-submission.
+        // We can just confirm.
+
+        if (!initialData) {
+            const userBets = await fetchUserBets(selectedUser.id);
+            const hasBet = userBets.some(b => b.raceId === raceId);
+
+            if (hasBet) {
+                if (!confirm("このレースはすでに報告済みです。上書きして修正しますか？")) {
+                    return;
+                }
+            }
+        }
+
+        // Parse amounts (remove commas)
+        const investmentVal = Number(investment.replace(/,/g, ''));
+        const returnVal = Number(returnAmount.replace(/,/g, ''));
 
         onSubmit({
             userId: selectedUser.id,
             raceId,
-            investment: Number(investment) || 0,
-            returnAmount: Number(returnAmount) || 0,
+            investment: investmentVal || 0,
+            returnAmount: returnVal || 0,
         });
+
+        // Close is handled by parent or here? Parent handles state, but we should call onClose
+        // onSubmit in parent calls setBets etc.
+        // wait, parent closes modal in handleAddBet? No.
+        // BettingModal calls onClose at end of submit.
 
         setInvestment("");
         setReturnAmount("");
         onClose();
+    };
+
+    // Number Formatting Helpers
+    const formatNumber = (val: string) => {
+        const num = val.replace(/[^0-9]/g, '');
+        if (!num) return "";
+        return Number(num).toLocaleString();
+    };
+
+    const handleInvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInvestment(formatNumber(e.target.value));
+    };
+
+    const handleReturnAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setReturnAmount(formatNumber(e.target.value));
     };
 
     const handleGuestLogin = () => {
@@ -185,20 +276,37 @@ export function BettingModal({ isOpen, onClose, onSubmit }: BettingModalProps) {
                                     ))}
                                 </div>
                                 <div className="grid grid-cols-6 gap-2 mt-2">
-                                    {Array.from({ length: 12 }).map((_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => setSelectedRaceNum(i + 1)}
-                                            className={clsx(
-                                                "aspect-square rounded-lg text-sm font-bold flex items-center justify-center border",
-                                                selectedRaceNum === i + 1
-                                                    ? "bg-yellow-500 border-yellow-500 text-black"
-                                                    : "border-white/10 hover:border-white/30 text-white/70"
-                                            )}
-                                        >
-                                            {i + 1}
-                                        </button>
-                                    ))}
+                                    {Array.from({ length: 12 }).map((_, i) => {
+                                        // Check lock status for each race button
+                                        const raceNum = i + 1;
+                                        const r = MOCK_RACES.find(ra => ra.location === selectedLocation && ra.raceNumber === raceNum);
+                                        let isBtnLocked = false;
+                                        if (!isAdmin && r?.startTime) {
+                                            const [h, m] = r.startTime.split(":").map(Number);
+                                            const d = new Date();
+                                            const rd = new Date();
+                                            rd.setHours(h, m, 0, 0);
+                                            if (d < rd) isBtnLocked = true;
+                                        }
+
+                                        return (
+                                            <button
+                                                key={i}
+                                                onClick={() => setSelectedRaceNum(raceNum)}
+                                                disabled={isBtnLocked}
+                                                className={clsx(
+                                                    "aspect-square rounded-lg text-sm font-bold flex items-center justify-center border transition-all",
+                                                    selectedRaceNum === raceNum
+                                                        ? "bg-yellow-500 border-yellow-500 text-black scale-110 shadow-lg z-10"
+                                                        : isBtnLocked
+                                                            ? "bg-gray-800 border-transparent text-gray-600 cursor-not-allowed"
+                                                            : "border-white/10 hover:border-white/30 text-white/70"
+                                                )}
+                                            >
+                                                {raceNum}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
 
                                 {/* Race Details */}
@@ -225,8 +333,8 @@ export function BettingModal({ isOpen, onClose, onSubmit }: BettingModalProps) {
                                         type="tel"
                                         pattern="[0-9]*"
                                         value={investment}
-                                        onChange={(e) => setInvestment(e.target.value)}
-                                        className="w-full bg-gray-800 text-white text-2xl font-mono p-3 rounded-xl border border-white/10 focus:border-yellow-500 outline-none placeholder:text-gray-700 text-center"
+                                        onChange={handleInvestmentChange}
+                                        className="w-full bg-gray-800 text-white text-3xl font-bold font-mono p-3 rounded-xl border border-white/10 focus:border-yellow-500 outline-none placeholder:text-gray-700 text-center"
                                         placeholder="0"
                                     />
                                 </div>
@@ -236,12 +344,17 @@ export function BettingModal({ isOpen, onClose, onSubmit }: BettingModalProps) {
                                         type="tel"
                                         pattern="[0-9]*"
                                         value={returnAmount}
-                                        onChange={(e) => setReturnAmount(e.target.value)}
-                                        className="w-full bg-gray-800 text-white text-2xl font-mono p-3 rounded-xl border border-white/10 focus:border-green-500 outline-none placeholder:text-gray-700 text-center"
+                                        onChange={handleReturnAmountChange}
+                                        className="w-full bg-gray-800 text-white text-3xl font-bold font-mono p-3 rounded-xl border border-white/10 focus:border-green-500 outline-none placeholder:text-gray-700 text-center"
                                         placeholder="0"
                                     />
                                 </div>
                             </div>
+                            {isLocked && (
+                                <div className="bg-blue-500/10 text-blue-400 p-3 rounded-xl text-center text-sm font-bold border border-blue-500/20">
+                                    ℹ️ このレースはまだ発走していません
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
@@ -250,9 +363,15 @@ export function BettingModal({ isOpen, onClose, onSubmit }: BettingModalProps) {
                     <div className="p-4 border-t border-white/10 bg-gray-800">
                         <button
                             onClick={handleSubmit}
-                            className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all text-lg"
+                            disabled={isLocked}
+                            className={clsx(
+                                "w-full font-bold py-4 rounded-xl shadow-lg transition-all text-lg",
+                                isLocked
+                                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                    : "bg-green-600 hover:bg-green-500 text-white active:scale-95"
+                            )}
                         >
-                            報告する
+                            {isLocked ? "未発走" : "報告する"}
                         </button>
                     </div>
                 )}

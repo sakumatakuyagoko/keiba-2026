@@ -46,6 +46,30 @@ export async function fetchBets(): Promise<Bet[]> {
     }));
 }
 
+export async function fetchUserBets(userId: string): Promise<Bet[]> {
+    if (useMock) return MOCK_BETS.filter(b => b.userId === userId);
+
+    const { data, error } = await supabase
+        .from('bets')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching user bets:', error);
+        return [];
+    }
+
+    return (data || []).map((b: any) => ({
+        id: b.id,
+        userId: b.user_id,
+        raceId: b.race_id,
+        investment: b.investment,
+        returnAmount: b.return_amount,
+        timestamp: b.created_at
+    }));
+}
+
 // Log to Google Sheet via GAS Web App
 async function logToSheet(bet: Omit<Bet, 'id' | 'timestamp'> & { user_name?: string }) {
     if (!GAS_URL) {
@@ -92,4 +116,19 @@ export async function createBet(bet: Omit<Bet, 'id' | 'timestamp'> & { user_name
     }
 
     return { error };
+}
+
+export async function resetBets() {
+    if (useMock) {
+        console.log("Mock Bets Reset");
+        return { error: null };
+    }
+
+    // Delete all rows in 'bets' table
+    const { error: deleteError } = await supabase
+        .from('bets')
+        .delete()
+        .gt('investment', -1); // Assuming investment is >= 0
+
+    return { error: deleteError };
 }

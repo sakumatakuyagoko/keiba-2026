@@ -3,13 +3,16 @@
 import { HTMLMotionProps, motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronDown, ChevronUp } from "lucide-react";
 import clsx from "clsx";
-import { LeaderboardEntry, User } from "@/lib/types";
-import { useState } from "react";
+import { LeaderboardEntry, User, Bet } from "@/lib/types";
+import { useState, useEffect } from "react";
+import { fetchUserBets } from "@/lib/api";
+import { MOCK_RACES } from "@/lib/mock";
 
 interface RankingCardProps extends HTMLMotionProps<"div"> {
     entry: LeaderboardEntry;
     index: number;
     currentUser: User | null;
+    onEditBet?: (bet: Bet) => void;
 }
 
 // JRA Colors
@@ -37,15 +40,22 @@ const getWakuColorClass = (horseNumber: number) => {
     return "bg-gray-500";
 };
 
-export function RankingCard({ entry, index, currentUser, className, ...props }: RankingCardProps) {
+export function RankingCard({ entry, index, currentUser, className, onEditBet, ...props }: RankingCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const horseNumber = index + 1;
     const wakuClass = getWakuColorClass(horseNumber);
     const isMe = currentUser?.id === entry.id;
+    const [history, setHistory] = useState<Bet[]>([]);
 
     const handleToggle = () => {
         if (isMe) setIsExpanded(!isExpanded);
     };
+
+    useEffect(() => {
+        if (isExpanded && isMe) {
+            fetchUserBets(entry.id).then(setHistory);
+        }
+    }, [isExpanded, isMe, entry.id]);
 
     return (
         <motion.div
@@ -142,6 +152,47 @@ export function RankingCard({ entry, index, currentUser, className, ...props }: 
                                 <div className={clsx("text-lg font-black font-mono", entry.returnRate >= 100 ? "text-blue-600" : "text-gray-800")}>
                                     {Math.round(entry.returnRate)}%
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* History List */}
+                        <div className="p-4 border-t border-gray-200">
+                            <h3 className="text-xs font-bold text-gray-500 mb-2 uppercase">戦績履歴 (クリックして修正)</h3>
+                            <div className="space-y-2">
+                                {history.map((bet) => {
+                                    const race = MOCK_RACES.find(r => r.id === bet.raceId);
+                                    let raceName = bet.raceId;
+                                    if (race) {
+                                        const locName = race.location === "Kokura" ? "小倉" : race.location === "Tokyo" ? "東京" : "阪神";
+                                        raceName = `${locName}${race.raceNumber}R`;
+                                    }
+                                    const profit = bet.returnAmount - bet.investment;
+
+                                    return (
+                                        <div
+                                            key={bet.id}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onEditBet?.(bet);
+                                            }}
+                                            className="bg-white p-2 rounded-lg border border-gray-200 flex justify-between items-center text-sm hover:bg-yellow-50 cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-bold bg-gray-100 px-2 py-0.5 rounded text-xs">{raceName}</span>
+                                                <span className="text-gray-500 text-xs">{new Date(bet.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            </div>
+                                            <div className="flex gap-4 font-mono">
+                                                <span className="text-gray-600">-{bet.investment.toLocaleString()}</span>
+                                                <span className={profit >= 0 ? "text-red-500 font-bold" : "text-blue-500"}>
+                                                    {profit > 0 ? "+" : ""}{profit.toLocaleString()}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                {history.length === 0 && (
+                                    <div className="text-center text-gray-400 text-xs py-2">履歴なし</div>
+                                )}
                             </div>
                         </div>
                     </motion.div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { RankingCard } from "@/components/RankingCard";
 import { BettingModal } from "@/components/BettingModal";
 import { NewsTicker } from "@/components/NewsTicker";
+import { AdminControls } from "@/components/AdminControls";
 import { MOCK_BETS, MOCK_USERS } from "@/lib/mock";
 import { LeaderboardEntry, Bet, User } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -25,6 +26,10 @@ export default function Home() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  // Admin State
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [editingBet, setEditingBet] = useState<Bet | null>(null);
 
   // Load User from LocalStorage on mount
   useEffect(() => {
@@ -170,6 +175,16 @@ export default function Home() {
     }
   };
 
+  const handleEditBet = (bet: Bet) => {
+    setEditingBet(bet);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setEditingBet(null);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#004d25] text-white font-sans">
       {/* Header */}
@@ -222,7 +237,13 @@ export default function Home() {
       <main className="flex-1 pb-24 bg-[#004d25]">
         <AnimatePresence>
           {leaderboard.map((entry, index) => (
-            <RankingCard key={entry.id} entry={entry} index={index} currentUser={currentUser} />
+            <RankingCard
+              key={entry.id}
+              entry={entry}
+              index={index}
+              currentUser={currentUser}
+              onEditBet={handleEditBet}
+            />
           ))}
         </AnimatePresence>
       </main>
@@ -241,9 +262,27 @@ export default function Home() {
 
       <AnimatePresence>
         {isModalOpen && (
-          <BettingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleAddBet} />
+          <BettingModal
+            isOpen={isModalOpen}
+            onClose={handleModalClose}
+            onSubmit={handleAddBet}
+            isAdmin={isAdmin}
+            initialData={editingBet}
+          />
         )}
       </AnimatePresence>
+
+      <AdminControls
+        isAdmin={isAdmin}
+        onLogin={(pass) => {
+          if (pass === "1155") {
+            setIsAdmin(true);
+            return true;
+          }
+          return false;
+        }}
+        onLogout={() => setIsAdmin(false)}
+      />
     </div>
   );
 }
