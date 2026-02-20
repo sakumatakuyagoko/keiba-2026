@@ -9,7 +9,7 @@ export const MOCK_USERS: User[] = [
     { id: "6", name: "ブームオレタ", jockey: "櫛部", pin: "0000", color: "#ffff00" },
     { id: "7", name: "ツチサカ", jockey: "土坂", pin: "0000", color: "#008000" },
     { id: "8", name: "イトウ", jockey: "伊藤", pin: "0000", color: "#008000" },
-    { id: "9", name: "ハンケン", jockey: "富田", pin: "0000", color: "#ffa500" },
+    { id: "9", name: "ハンケン", jockey: "冨田", pin: "0000", color: "#ffa500" },
     { id: "10", name: "アサミハズバンド", jockey: "大橋", pin: "0000", color: "#ffa500" },
     { id: "11", name: "オオクボハグルマ", jockey: "大久保", pin: "0000", color: "#ffc0cb" },
     { id: "12", name: "キンパチティーチャ", jockey: "佐久間", pin: "0000", color: "#ffc0cb" },

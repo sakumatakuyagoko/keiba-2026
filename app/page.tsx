@@ -20,7 +20,7 @@ import { supabase } from "@/lib/supabase";
 const ORDERED_JOCKEYS = [
   "原田", "矢橋", "岡本", "安井",
   "稲葉", "櫛部", "土坂", "伊藤",
-  "富田", "大橋", "大久保", "佐久間"
+  "冨田", "大橋", "大久保", "佐久間"
 ];
 
 export default function Home() {
