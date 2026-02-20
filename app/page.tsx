@@ -114,7 +114,7 @@ export default function Home() {
     const validBets = Array.from(latestBetsMap.values());
 
     // 2. Calculate Stats
-    const entries: LeaderboardEntry[] = users.map((user) => {
+    const statsEntries: LeaderboardEntry[] = users.map((user) => {
       const userBets = validBets.filter((b) => b.userId === user.id);
       const totalInvestment = userBets.reduce((sum, b) => sum + Number(b.investment || 0), 0);
       const totalReturn = userBets.reduce((sum, b) => sum + Number(b.returnAmount || 0), 0);
@@ -135,16 +135,18 @@ export default function Home() {
     });
 
     // 3. Determine King (Max Investment)
-    const maxInvestment = Math.max(...entries.map((e) => e.totalInvestment));
-    entries.forEach((e) => {
-      if (e.totalInvestment === maxInvestment && maxInvestment > 0) {
-        e.isKing = true;
-      }
-    });
+    // Use reduce to find max to avoid spread operator limits or issues
+    const maxInvestment = statsEntries.reduce((max, e) => Math.max(max, e.totalInvestment), 0);
+
+    // Create new array with isKing flag (Immutable)
+    const entriesWithKing = statsEntries.map(e => ({
+      ...e,
+      isKing: maxInvestment > 0 && e.totalInvestment === maxInvestment
+    }));
 
     // 4. Determine Rank
     // Rules: ReturnRate DESC -> Investment DESC
-    const rankedEntries = [...entries].sort((a, b) => {
+    const rankedEntries = [...entriesWithKing].sort((a, b) => {
       if (b.returnRate !== a.returnRate) {
         return b.returnRate - a.returnRate;
       }
@@ -152,23 +154,29 @@ export default function Home() {
     });
 
     // Assign Ranks
-    let currentRank = 1;
+    const entriesWithRank: LeaderboardEntry[] = [];
     rankedEntries.forEach((entry, i) => {
+      let rank = i + 1;
       if (i > 0) {
         const prev = rankedEntries[i - 1];
         if (prev.returnRate === entry.returnRate && prev.totalInvestment === entry.totalInvestment) {
-          // Same rank
-        } else {
-          currentRank = i + 1;
+          // Check the previously added entry in the new list
+          rank = entriesWithRank[i - 1].rank;
         }
       }
-      // Update original entry object
-      const original = entries.find(e => e.id === entry.id);
-      if (original) original.rank = currentRank;
+      entriesWithRank.push({ ...entry, rank });
     });
 
-    // Final leaderboard strictly follows ORDERED_NAMES (which is `users` order)
-    setLeaderboard(entries);
+    // Final leaderboard must follow the ORDERED_JOCKEYS (which is `users` order) or just keep `users` order?
+    // The original code mapped `entries` back to `setLeaderboard`. 
+    // `entries` was created from `users.map`.
+    // So we need to restore the original order of `users`.
+    const finalLeaderboard = users.map(user => {
+      const ranked = entriesWithRank.find(r => r.id === user.id);
+      return ranked || { ...user, totalInvestment: 0, totalReturn: 0, netProfit: 0, returnRate: 0, rank: 999, isKing: false };
+    });
+
+    setLeaderboard(finalLeaderboard);
   }, [bets, users]);
 
   const handleAddBet = async (newBetData: { userId: string; raceId: string; investment: number; returnAmount: number }) => {
@@ -244,7 +252,7 @@ export default function Home() {
         // Investment King
         const king = [...leaderboard].sort((a, b) => b.totalInvestment - a.totalInvestment)[0];
 
-        return `全投票締め切り。結果確定しました。　　優勝 ${first?.name || "-"} さん（${Math.round(first?.returnRate || 0)}％）　　準優勝 ${second?.name || "-"} さん（${Math.round(second?.returnRate || 0)}％）　　３位 ${third?.name || "-"} さん（${Math.round(third?.returnRate || 0)}％）　　投資王 ${king?.name || "-"}さん　でした。おめでとうございます！`;
+        return `全投票締め切り。結果確定しました。　　優勝 ${first?.name || "-"} さん（${Math.round(first?.returnRate || 0)}％）　　準優勝 ${second?.name || "-"} さん（${Math.round(second?.returnRate || 0)}％）　　３位 ${third?.name || "-"} さん（${Math.round(third?.returnRate || 0)}％）　　投資王 ${king?.name || "-"}さん（投資王）　でした。おめでとうございます！`;
       })()} />
 
       {/* Helper Header + Legend */}
