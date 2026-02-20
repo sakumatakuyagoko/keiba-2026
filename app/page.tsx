@@ -6,6 +6,7 @@ import { RankingCard } from "@/components/RankingCard";
 import { BettingModal } from "@/components/BettingModal";
 import { NewsTicker } from "@/components/NewsTicker";
 import { AdminControls } from "@/components/AdminControls";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import { MOCK_BETS, MOCK_USERS } from "@/lib/mock";
 import { LeaderboardEntry, Bet, User } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -33,7 +34,9 @@ export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingBet, setEditingBet] = useState<Bet | null>(null);
   const [lastBetUpdate, setLastBetUpdate] = useState<number>(Date.now());
+
   const [isBettingClosed, setIsBettingClosed] = useState(false);
+  const [showClosedAlert, setShowClosedAlert] = useState(false);
 
   // Load User from LocalStorage on mount
   useEffect(() => {
@@ -287,7 +290,7 @@ export default function Home() {
           whileTap={{ scale: 0.9 }}
           onClick={() => {
             if (isBettingClosed && !isAdmin) {
-              alert("全ての投票は締め切られました。\n結果発表をお待ちください。");
+              setShowClosedAlert(true);
               return;
             }
             setIsModalOpen(true);
@@ -334,6 +337,15 @@ export default function Home() {
           return false;
         }}
         onLogout={() => setIsAdmin(false)}
+      />
+
+      <ConfirmModal
+        isOpen={showClosedAlert}
+        title="投票受付終了"
+        message={"全ての投票は締め切られました。\n結果発表をお待ちください。"}
+        isAlert={true}
+        onConfirm={() => setShowClosedAlert(false)}
+        onCancel={() => setShowClosedAlert(false)}
       />
     </div>
   );
