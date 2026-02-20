@@ -1,4 +1,3 @@
-```
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -46,13 +45,8 @@ export default function Home() {
     const loadData = async () => {
       const [uArgs, bArgs] = await Promise.all([fetchUsers(), fetchBets()]);
 
-      // Sort users by ORDERED_NAMES by name string
-      const sortedUsers = uArgs.sort((a, b) => {
-        const indexA = ORDERED_NAMES.indexOf(a.name);
-        const indexB = ORDERED_NAMES.indexOf(b.name);
-        // If name not in list (edited?), put at end
-        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-      });
+      // Sort users by ID (Keep order fixed even if name changes)
+      const sortedUsers = uArgs.sort((a, b) => Number(a.id) - Number(b.id));
       setUsers(sortedUsers);
       setBets(bArgs);
     };
@@ -97,7 +91,7 @@ export default function Home() {
     const latestBetsMap = new Map<string, Bet>();
 
     bets.forEach(bet => {
-      const key = `${ bet.userId } -${ bet.raceId } `;
+      const key = `${bet.userId} -${bet.raceId} `;
       const existing = latestBetsMap.get(key);
       if (!existing || new Date(bet.timestamp) > new Date(existing.timestamp)) {
         latestBetsMap.set(key, bet);
@@ -167,14 +161,14 @@ export default function Home() {
 
   const handleAddBet = async (newBetData: { userId: string; raceId: string; investment: number; returnAmount: number }) => {
     if (isBettingClosed && !isAdmin) {
-        alert("全投票締め切り済みです。");
-        return;
+      alert("全投票締め切り済みです。");
+      return;
     }
     const { createBet } = await import("@/lib/api");
     const user = users.find(u => u.id === newBetData.userId);
     await createBet({
       ...newBetData,
-      user_name: user ? `${ user.name } 【${ user.jockey }】` : "Unknown"
+      user_name: user ? `${user.name} 【${user.jockey}】` : "Unknown"
     });
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -218,24 +212,24 @@ export default function Home() {
 
       {/* Ticker */}
       <NewsTicker bets={bets} users={users} customMessage={(() => {
-          if (!isBettingClosed) return null;
-          
-          // Result Logic
-          const sorted = [...leaderboard].sort((a, b) => {
-              // Priority: NetProfit desc
-              return b.netProfit - a.netProfit;
-          });
-          
-          if (sorted.length === 0) return "全投票締め切り。結果確定しました。";
+        if (!isBettingClosed) return null;
 
-          const first = sorted[0];
-          const second = sorted[1];
-          const third = sorted[2];
-          
-          // Investment King
-          const king = [...leaderboard].sort((a, b) => b.totalInvestment - a.totalInvestment)[0];
+        // Result Logic
+        const sorted = [...leaderboard].sort((a, b) => {
+          // Priority: NetProfit desc
+          return b.netProfit - a.netProfit;
+        });
 
-          return `全投票締め切り。結果確定しました。　　優勝 ${ first?.name || "-" } さん（${ Math.round(first?.returnRate || 0) }％）　　準優勝 ${ second?.name || "-" } さん（${ Math.round(second?.returnRate || 0) }％）　　３位 ${ third?.name || "-" } さん（${ Math.round(third?.returnRate || 0) }％）　　投資王 ${ king?.name || "-" }さん　でした。おめでとうございます！`;
+        if (sorted.length === 0) return "全投票締め切り。結果確定しました。";
+
+        const first = sorted[0];
+        const second = sorted[1];
+        const third = sorted[2];
+
+        // Investment King
+        const king = [...leaderboard].sort((a, b) => b.totalInvestment - a.totalInvestment)[0];
+
+        return `全投票締め切り。結果確定しました。　　優勝 ${first?.name || "-"} さん（${Math.round(first?.returnRate || 0)}％）　　準優勝 ${second?.name || "-"} さん（${Math.round(second?.returnRate || 0)}％）　　３位 ${third?.name || "-"} さん（${Math.round(third?.returnRate || 0)}％）　　投資王 ${king?.name || "-"}さん　でした。おめでとうございます！`;
       })()} />
 
       {/* Helper Header + Legend */}
@@ -321,5 +315,4 @@ export default function Home() {
       />
     </div>
   );
-}
-```
+

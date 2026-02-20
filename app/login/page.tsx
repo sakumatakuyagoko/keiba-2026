@@ -36,12 +36,8 @@ export default function LoginPage() {
     useEffect(() => {
         const loadData = async () => {
             const data = await fetchUsers();
-            // Sort by ORDERED_NAMES
-            const sorted = data.sort((a, b) => {
-                const indexA = ORDERED_NAMES.indexOf(a.name);
-                const indexB = ORDERED_NAMES.indexOf(b.name);
-                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-            });
+            // Sort by ID to keep order constant
+            const sorted = data.sort((a, b) => Number(a.id) - Number(b.id));
             setUsers(sorted);
 
             // Check current login
@@ -112,7 +108,19 @@ export default function LoginPage() {
         }
 
         if (pin === selectedUser.pin) {
+            // Validate Name
             if (editName !== selectedUser.name) {
+                if (!/^[ァ-ヶー]{2,9}$/.test(editName)) {
+                    setModal({
+                        isOpen: true,
+                        title: "エラー",
+                        message: "馬名は「カタカナ2〜9文字」で入力してください。",
+                        onConfirm: () => setModal(prev => ({ ...prev, isOpen: false })),
+                        isAlert: true
+                    });
+                    setLoading(false);
+                    return;
+                }
                 await updateUserName(selectedUser.id, editName);
                 selectedUser.name = editName;
             }
@@ -130,6 +138,16 @@ export default function LoginPage() {
         if (!selectedUser) return;
 
         // Validation
+        if (!/^[ァ-ヶー]{2,9}$/.test(editName)) {
+            setModal({
+                isOpen: true,
+                title: "エラー",
+                message: "馬名は「カタカナ2〜9文字」で入力してください。",
+                onConfirm: () => setModal(prev => ({ ...prev, isOpen: false })),
+                isAlert: true
+            });
+            return;
+        }
         if (!/^\d{4}$/.test(newPin)) {
             setModal({
                 isOpen: true,

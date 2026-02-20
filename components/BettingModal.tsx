@@ -43,11 +43,7 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
         const load = async () => {
             const u = await fetchUsers();
             // Sort
-            const sorted = u.sort((a, b) => {
-                const indexA = ORDERED_NAMES.indexOf(a.name);
-                const indexB = ORDERED_NAMES.indexOf(b.name);
-                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-            });
+            const sorted = u.sort((a, b) => Number(a.id) - Number(b.id));
             setUsers(sorted);
 
             const saved = localStorage.getItem('currentUser');
