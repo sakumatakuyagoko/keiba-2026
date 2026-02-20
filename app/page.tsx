@@ -15,6 +15,7 @@ import Link from "next/link";
 import { fetchBets, fetchUsers, fetchSystemStatus } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { CelebrationOverlay } from "@/components/CelebrationOverlay";
+import Image from "next/image";
 
 // Fixed Order List
 // Fixed Order List (Jockey Name)
@@ -232,11 +233,17 @@ export default function Home() {
         {/* Shine Effect Overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
 
-        <h1 className="text-lg font-black tracking-widest text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-10 flex items-center gap-1">
-          鶯谷杯
-          <span className="flex items-center text-yellow-400">
-            <span className="mx-1 text-xl">🏆</span>
-            <span className="text-base">小倉2026</span>
+        <h1 className="z-10 flex items-center gap-2">
+          <Image
+            src="/logo.png"
+            alt="鶯谷杯"
+            width={100}
+            height={32}
+            className="h-8 w-auto object-contain"
+          />
+          <span className="flex items-center text-yellow-400 font-bold">
+            <span className="mx-1">🏆</span>
+            <span className="text-sm">小倉2026</span>
           </span>
         </h1>
         <Link href="/login" className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors border border-white/20 z-10">
