@@ -14,6 +14,7 @@ interface BettingModalProps {
     onSubmit: (bet: { userId: string; raceId: string; investment: number; returnAmount: number }) => void;
     isAdmin?: boolean;
     initialData?: Bet | null;
+    isBettingClosed?: boolean;
 }
 
 // Fixed Order List
@@ -23,7 +24,7 @@ const ORDERED_NAMES = [
     "ハンケン", "アサミハズバンド", "オオクボハグルマ", "キンパチティーチャ"
 ];
 
-export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initialData }: BettingModalProps) {
+export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initialData, isBettingClosed = false }: BettingModalProps) {
     const [users, setUsers] = useState<User[]>(MOCK_USERS);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -89,6 +90,11 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
     // Get Current Race Info
     const currentRace = MOCK_RACES.find(r => r.location === selectedLocation && r.raceNumber === selectedRaceNum);
 
+    // Close All Lock
+    if (isBettingClosed && !isAdmin) {
+        // Force close or show blocked message override in render
+    }
+
     // Locking Logic
     const isLocked = (() => {
         if (isAdmin) return false;
@@ -108,6 +114,10 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedUser) return;
+        if (isBettingClosed && !isAdmin) {
+            alert("全投票締め切り済みです。結果発表をお待ちください。");
+            return;
+        }
         if (isLocked) {
             alert("このレースはまだ発走していないため報告できません。");
             return;
@@ -355,6 +365,11 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
                                     ℹ️ このレースはまだ発走していません
                                 </div>
                             )}
+                            {isBettingClosed && !isAdmin && (
+                                <div className="bg-red-500/10 text-red-400 p-3 rounded-xl text-center text-sm font-bold border border-red-500/20">
+                                    ⛔ 全投票締め切り済み
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
@@ -363,15 +378,15 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
                     <div className="p-4 border-t border-white/10 bg-gray-800">
                         <button
                             onClick={handleSubmit}
-                            disabled={isLocked}
+                            disabled={isLocked || (isBettingClosed && !isAdmin)}
                             className={clsx(
                                 "w-full font-bold py-4 rounded-xl shadow-lg transition-all text-lg",
-                                isLocked
+                                isLocked || (isBettingClosed && !isAdmin)
                                     ? "bg-gray-600 text-gray-400 cursor-not-allowed"
                                     : "bg-green-600 hover:bg-green-500 text-white active:scale-95"
                             )}
                         >
-                            {isLocked ? "未発走" : "報告する"}
+                            {isBettingClosed && !isAdmin ? "受付終了" : (isLocked ? "未発走" : "報告する")}
                         </button>
                     </div>
                 )}

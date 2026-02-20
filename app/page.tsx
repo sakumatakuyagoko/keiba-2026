@@ -1,6 +1,8 @@
+```
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { format } from "date-fns";
 import { RankingCard } from "@/components/RankingCard";
 import { BettingModal } from "@/components/BettingModal";
 import { NewsTicker } from "@/components/NewsTicker";
@@ -31,6 +33,7 @@ export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingBet, setEditingBet] = useState<Bet | null>(null);
   const [lastBetUpdate, setLastBetUpdate] = useState<number>(Date.now());
+  const [isBettingClosed, setIsBettingClosed] = useState(false);
 
   // Load User from LocalStorage on mount
   useEffect(() => {
@@ -94,7 +97,7 @@ export default function Home() {
     const latestBetsMap = new Map<string, Bet>();
 
     bets.forEach(bet => {
-      const key = `${bet.userId}-${bet.raceId}`;
+      const key = `${ bet.userId } -${ bet.raceId } `;
       const existing = latestBetsMap.get(key);
       if (!existing || new Date(bet.timestamp) > new Date(existing.timestamp)) {
         latestBetsMap.set(key, bet);
@@ -163,11 +166,15 @@ export default function Home() {
   }, [bets, users]);
 
   const handleAddBet = async (newBetData: { userId: string; raceId: string; investment: number; returnAmount: number }) => {
+    if (isBettingClosed && !isAdmin) {
+        alert("全投票締め切り済みです。");
+        return;
+    }
     const { createBet } = await import("@/lib/api");
     const user = users.find(u => u.id === newBetData.userId);
     await createBet({
       ...newBetData,
-      user_name: user ? `${user.name} 【${user.jockey}】` : "Unknown"
+      user_name: user ? `${ user.name } 【${ user.jockey }】` : "Unknown"
     });
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -209,8 +216,27 @@ export default function Home() {
         </Link>
       </header>
 
-      {/* News Ticker */}
-      <NewsTicker bets={bets} users={users} />
+      {/* Ticker */}
+      <NewsTicker bets={bets} users={users} customMessage={(() => {
+          if (!isBettingClosed) return null;
+          
+          // Result Logic
+          const sorted = [...leaderboard].sort((a, b) => {
+              // Priority: NetProfit desc
+              return b.netProfit - a.netProfit;
+          });
+          
+          if (sorted.length === 0) return "全投票締め切り。結果確定しました。";
+
+          const first = sorted[0];
+          const second = sorted[1];
+          const third = sorted[2];
+          
+          // Investment King
+          const king = [...leaderboard].sort((a, b) => b.totalInvestment - a.totalInvestment)[0];
+
+          return `全投票締め切り。結果確定しました。　　優勝 ${ first?.name || "-" } さん（${ Math.round(first?.returnRate || 0) }％）　　準優勝 ${ second?.name || "-" } さん（${ Math.round(second?.returnRate || 0) }％）　　３位 ${ third?.name || "-" } さん（${ Math.round(third?.returnRate || 0) }％）　　投資王 ${ king?.name || "-" }さん　でした。おめでとうございます！`;
+      })()} />
 
       {/* Helper Header + Legend */}
       <div className="flex items-center text-xs font-bold text-gray-300 bg-[#003318] border-b border-gray-600 py-2">
@@ -277,9 +303,16 @@ export default function Home() {
 
       <AdminControls
         isAdmin={isAdmin}
-        onLogin={(pass) => {
+        onLogin={async (pass) => {
           if (pass === "1155") {
             setIsAdmin(true);
+            const u = await fetchUsers();
+            setUsers(u);
+            const b = await fetchBets();
+            setBets(b);
+            const { fetchSystemStatus } = await import("@/lib/api");
+            const { isBettingClosed: fetchedIsBettingClosed } = await fetchSystemStatus();
+            setIsBettingClosed(fetchedIsBettingClosed);
             return true;
           }
           return false;
@@ -289,3 +322,4 @@ export default function Home() {
     </div>
   );
 }
+```
