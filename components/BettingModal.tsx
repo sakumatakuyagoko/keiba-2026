@@ -18,10 +18,11 @@ interface BettingModalProps {
 }
 
 // Fixed Order List
-const ORDERED_NAMES = [
-    "ウグイスバレー", "ニンゲンビレッジ", "チェンジドライバ", "エセドバイオー",
-    "サイレントイナバ", "ブームオレタ", "ツチサカ", "イトウ",
-    "ハンケン", "アサミハズバンド", "オオクボハグルマ", "キンパチティーチャ"
+// Fixed Order List (Jockey Name)
+const ORDERED_JOCKEYS = [
+    "原田", "矢橋", "岡本", "安井",
+    "稲葉", "櫛部", "土坂", "伊藤",
+    "富田", "大橋", "大久保", "佐久間"
 ];
 
 export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initialData, isBettingClosed = false }: BettingModalProps) {
@@ -43,7 +44,11 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
         const load = async () => {
             const u = await fetchUsers();
             // Sort
-            const sorted = u.sort((a, b) => Number(a.id) - Number(b.id));
+            const sorted = u.sort((a, b) => {
+                const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
+                const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
+                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+            });
             setUsers(sorted);
 
             const saved = localStorage.getItem('currentUser');

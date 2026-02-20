@@ -15,10 +15,11 @@ import { fetchBets, fetchUsers } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 
 // Fixed Order List
-const ORDERED_NAMES = [
-  "ウグイスバレー", "ニンゲンビレッジ", "チェンジドライバ", "エセドバイオー",
-  "サイレントイナバ", "ブームオレタ", "ツチサカ", "イトウ",
-  "ハンケン", "アサミハズバンド", "オオクボハグルマ", "キンパチティーチャ"
+// Fixed Order List (Jockey Name)
+const ORDERED_JOCKEYS = [
+  "原田", "矢橋", "岡本", "安井",
+  "稲葉", "櫛部", "土坂", "伊藤",
+  "富田", "大橋", "大久保", "佐久間"
 ];
 
 export default function Home() {
@@ -45,8 +46,12 @@ export default function Home() {
     const loadData = async () => {
       const [uArgs, bArgs] = await Promise.all([fetchUsers(), fetchBets()]);
 
-      // Sort users by ID (Keep order fixed even if name changes)
-      const sortedUsers = uArgs.sort((a, b) => Number(a.id) - Number(b.id));
+      // Sort users by ORDERED_JOCKEYS (Fixed order)
+      const sortedUsers = uArgs.sort((a, b) => {
+        const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
+        const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
+        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+      });
       setUsers(sortedUsers);
       setBets(bArgs);
     };
