@@ -86,8 +86,8 @@ export default function Home() {
           id: payload.new.id,
           userId: payload.new.user_id,
           raceId: payload.new.race_id,
-          investment: payload.new.investment,
-          returnAmount: payload.new.return_amount,
+          investment: Number(payload.new.investment),
+          returnAmount: Number(payload.new.return_amount),
           timestamp: payload.new.created_at
         };
 
@@ -116,8 +116,8 @@ export default function Home() {
     // 2. Calculate Stats
     const entries: LeaderboardEntry[] = users.map((user) => {
       const userBets = validBets.filter((b) => b.userId === user.id);
-      const totalInvestment = userBets.reduce((sum, b) => sum + b.investment, 0);
-      const totalReturn = userBets.reduce((sum, b) => sum + b.returnAmount, 0);
+      const totalInvestment = userBets.reduce((sum, b) => sum + Number(b.investment || 0), 0);
+      const totalReturn = userBets.reduce((sum, b) => sum + Number(b.returnAmount || 0), 0);
       const netProfit = totalReturn - totalInvestment;
 
       // User Request: 100% baseline. 0/1000 -> 0%. 1000/1000 -> 100%.
