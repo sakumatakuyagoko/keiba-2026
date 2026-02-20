@@ -14,6 +14,7 @@ import { Plus, User as UserIcon, Star } from "lucide-react";
 import Link from "next/link";
 import { fetchBets, fetchUsers, fetchSystemStatus } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
+import { CelebrationOverlay } from "@/components/CelebrationOverlay";
 
 // Fixed Order List
 // Fixed Order List (Jockey Name)
@@ -37,6 +38,7 @@ export default function Home() {
 
   const [isBettingClosed, setIsBettingClosed] = useState(false);
   const [showClosedAlert, setShowClosedAlert] = useState(false);
+  const [celebrationType, setCelebrationType] = useState<'win' | 'loss' | null>(null);
 
   // Load User from LocalStorage on mount
   useEffect(() => {
@@ -203,6 +205,14 @@ export default function Home() {
       setBets(prev => [...prev, newBet]);
     }
     setLastBetUpdate(Date.now());
+
+    // Celebration Logic
+    const profit = newBetData.returnAmount - newBetData.investment;
+    if (profit > 0) {
+      setCelebrationType('win');
+    } else {
+      setCelebrationType('loss');
+    }
   };
 
   const handleEditBet = (bet: Bet) => {
@@ -368,6 +378,11 @@ export default function Home() {
         isAlert={true}
         onConfirm={() => setShowClosedAlert(false)}
         onCancel={() => setShowClosedAlert(false)}
+      />
+
+      <CelebrationOverlay
+        type={celebrationType}
+        onClose={() => setCelebrationType(null)}
       />
     </div>
   );
