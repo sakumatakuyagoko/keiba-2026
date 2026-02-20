@@ -6,7 +6,7 @@ import clsx from "clsx";
 
 interface AdminControlsProps {
     isAdmin: boolean;
-    onLogin: (password: string) => boolean;
+    onLogin: (password: string) => boolean | Promise<boolean>;
     onLogout: () => void;
     isBettingClosed?: boolean; // New prop
 }
@@ -16,8 +16,8 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
 
-    const handleLogin = () => {
-        if (onLogin(password)) {
+    const handleLogin = async () => {
+        if (await onLogin(password)) {
             setPassword("");
             setError(false);
             setIsOpen(false); // Close modal on success if we want, or keep admin controls open
