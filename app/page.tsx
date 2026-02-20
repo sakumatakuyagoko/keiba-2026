@@ -11,7 +11,7 @@ import { LeaderboardEntry, Bet, User } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, User as UserIcon, Star } from "lucide-react";
 import Link from "next/link";
-import { fetchBets, fetchUsers } from "@/lib/api";
+import { fetchBets, fetchUsers, fetchSystemStatus } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 
 // Fixed Order List
@@ -44,7 +44,7 @@ export default function Home() {
   // Initial Fetch
   useEffect(() => {
     const loadData = async () => {
-      const [uArgs, bArgs] = await Promise.all([fetchUsers(), fetchBets()]);
+      const [uArgs, bArgs, sysArgs] = await Promise.all([fetchUsers(), fetchBets(), fetchSystemStatus()]);
 
       // Sort users by ORDERED_JOCKEYS (Fixed order)
       const sortedUsers = uArgs.sort((a, b) => {
@@ -54,6 +54,7 @@ export default function Home() {
       });
       setUsers(sortedUsers);
       setBets(bArgs);
+      setIsBettingClosed(sysArgs.isBettingClosed);
     };
     loadData();
   }, []);
@@ -63,6 +64,9 @@ export default function Home() {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
     const channel = supabase
       .channel('realtime bets')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'system_settings' }, (payload) => {
+        setIsBettingClosed(payload.new.is_betting_closed);
+      })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bets' }, (payload) => {
         const newBet: Bet = {
           id: payload.new.id,
@@ -316,7 +320,6 @@ export default function Home() {
             setUsers(sortedUsers);
             const b = await fetchBets();
             setBets(b);
-            const { fetchSystemStatus } = await import("@/lib/api");
             const { isBettingClosed: fetchedIsBettingClosed } = await fetchSystemStatus();
             setIsBettingClosed(fetchedIsBettingClosed);
             return true;

@@ -45,8 +45,7 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
 
         if (confirm(message)) {
             await updateSystemStatus(!isBettingClosed);
-            // Parent page should listen to realtime or refresh, but we can rely on page reload or state update if implemented
-            window.location.reload();
+            // Realtime subscription in parent will update the state
         }
     };
 
