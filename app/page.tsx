@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { format } from "date-fns";
+
 import { RankingCard } from "@/components/RankingCard";
 import { BettingModal } from "@/components/BettingModal";
 import { NewsTicker } from "@/components/NewsTicker";
@@ -315,4 +315,5 @@ export default function Home() {
       />
     </div>
   );
+}
 
