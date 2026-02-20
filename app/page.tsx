@@ -369,18 +369,6 @@ export default function Home() {
         onConfirm={() => setShowClosedAlert(false)}
         onCancel={() => setShowClosedAlert(false)}
       />
-
-      {/* DEBUG VIEW - Temporary */}
-      {isAdmin && (
-        <div className="fixed bottom-0 left-0 right-0 bg-black/90 text-green-400 p-2 text-xs font-mono z-[9999] overflow-auto max-h-40">
-          <div>DEBUG: Investment King Check</div>
-          {leaderboard.map(u => (
-            <div key={u.id}>
-              {u.name}: Invest={u.totalInvestment} (Type: {typeof u.totalInvestment}) | IsKing={u.isKing ? "YES" : "NO"}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
