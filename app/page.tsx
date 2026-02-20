@@ -228,8 +228,11 @@ export default function Home() {
 
         // Result Logic
         const sorted = [...leaderboard].sort((a, b) => {
-          // Priority: NetProfit desc
-          return b.netProfit - a.netProfit;
+          // Priority: ReturnRate desc -> Investment desc (Same as main leaderboard)
+          if (b.returnRate !== a.returnRate) {
+            return b.returnRate - a.returnRate;
+          }
+          return b.totalInvestment - a.totalInvestment;
         });
 
         if (sorted.length === 0) return "全投票締め切り。結果確定しました。";
