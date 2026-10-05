@@ -1,0 +1,128 @@
+{
+  "tournaments": [
+    {
+      "id": "1",
+      "edition": "第1回",
+      "name": "サッポロ競馬大会",
+      "date": "2023/07/22",
+      "venue": "札幌",
+      "champion": {
+        "jockey": "矢橋",
+        "horse": "ニンゲンビレッジ",
+        "returnRate": 238.3,
+        "netProfit": 219000,
+        "investment": 158300,
+        "returnAmount": 377300
+      },
+      "king": {
+        "jockey": "矢橋",
+        "horse": "ニンゲンビレッジ",
+        "investment": 158300
+      },
+      "results": [
+        { "rank": 1, "jockey": "矢橋", "horse": "ニンゲンビレッジ", "returnRate": 238.3, "investment": 158300, "returnAmount": 377300, "netProfit": 219000, "isKing": true },
+        { "rank": 2, "jockey": "大橋", "horse": "アサミハズバンド", "returnRate": 179.8, "investment": 42400, "returnAmount": 76230, "netProfit": 33830, "isKing": false },
+        { "rank": 3, "jockey": "原田", "horse": "ウグイスバレー", "returnRate": 57.0, "investment": 44000, "returnAmount": 25070, "netProfit": -18930, "isKing": false },
+        { "rank": 4, "jockey": "櫛部", "horse": "クシベウィンテック", "returnRate": 47.1, "investment": 98900, "returnAmount": 46550, "netProfit": -52350, "isKing": false },
+        { "rank": 5, "jockey": "佐久間", "horse": "キンパチティーチャ", "returnRate": 33.3, "investment": 100500, "returnAmount": 33500, "netProfit": -67000, "isKing": false }
+      ]
+    },
+    {
+      "id": "2",
+      "edition": "第2回",
+      "name": "サッポロ競馬大会",
+      "date": "2024/07/13",
+      "venue": "札幌",
+      "champion": {
+        "jockey": "原田",
+        "horse": "ウグイスバレー",
+        "returnRate": 191.1,
+        "netProfit": 44180,
+        "investment": 48500,
+        "returnAmount": 92680
+      },
+      "king": {
+        "jockey": "矢橋",
+        "horse": "ニンゲンビレッジ",
+        "investment": 127600
+      },
+      "results": [
+        { "rank": 1, "jockey": "原田", "horse": "ウグイスバレー", "returnRate": 191.1, "investment": 48500, "returnAmount": 92680, "netProfit": 44180, "isKing": false },
+        { "rank": 2, "jockey": "大橋", "horse": "アサミハズバンド", "returnRate": 134.6, "investment": 35500, "returnAmount": 47770, "netProfit": 12270, "isKing": false },
+        { "rank": 3, "jockey": "矢橋", "horse": "ニンゲンビレッジ", "returnRate": 58.1, "investment": 127600, "returnAmount": 74080, "netProfit": -53520, "isKing": true },
+        { "rank": 4, "jockey": "稲葉", "horse": "サイレントイナバ", "returnRate": 56.0, "investment": 32500, "returnAmount": 18200, "netProfit": -14300, "isKing": false },
+        { "rank": 5, "jockey": "岡本", "horse": "チェンジドライバ", "returnRate": 48.9, "investment": 70100, "returnAmount": 34270, "netProfit": -35830, "isKing": false },
+        { "rank": 6, "jockey": "林", "horse": "イケメンフェイク", "returnRate": 44.0, "investment": 47800, "returnAmount": 21030, "netProfit": -26770, "isKing": false },
+        { "rank": 7, "jockey": "佐久間", "horse": "キンパチティーチャ", "returnRate": 38.5, "investment": 65900, "returnAmount": 25350, "netProfit": -40550, "isKing": false },
+        { "rank": 8, "jockey": "櫛部", "horse": "ブームオレタ", "returnRate": 30.0, "investment": 67000, "returnAmount": 20070, "netProfit": -46930, "isKing": false },
+        { "rank": 9, "jockey": "中川", "horse": "ブラジリアンワックス", "returnRate": 5.3, "investment": 12200, "returnAmount": 650, "netProfit": -11550, "isKing": false }
+      ]
+    },
+    {
+      "id": "3",
+      "edition": "第3回",
+      "name": "サッポロ競馬大会",
+      "date": "2025/07/26",
+      "venue": "札幌",
+      "champion": {
+        "jockey": "岡本",
+        "horse": "チェンジドライバ",
+        "returnRate": 205.3,
+        "netProfit": 55910,
+        "investment": 53100,
+        "returnAmount": 109010
+      },
+      "king": {
+        "jockey": "住田",
+        "horse": "アラキノブヨシ",
+        "investment": 252900
+      },
+      "results": [
+        { "rank": 1, "jockey": "岡本", "horse": "チェンジドライバ", "returnRate": 205.3, "investment": 53100, "returnAmount": 109010, "netProfit": 55910, "isKing": false },
+        { "rank": 2, "jockey": "原田", "horse": "ウグイスバレー", "returnRate": 119.0, "investment": 35500, "returnAmount": 42240, "netProfit": 6740, "isKing": false },
+        { "rank": 3, "jockey": "中山", "horse": "ベイビーペニス", "returnRate": 32.4, "investment": 249400, "returnAmount": 80860, "netProfit": -168540, "isKing": false },
+        { "rank": 4, "jockey": "矢橋", "horse": "ニンゲンビレッジ", "returnRate": 31.4, "investment": 150900, "returnAmount": 47380, "netProfit": -103520, "isKing": false },
+        { "rank": 5, "jockey": "安井", "horse": "エセドバイオー", "returnRate": 27.6, "investment": 108000, "returnAmount": 29800, "netProfit": -78200, "isKing": false },
+        { "rank": 6, "jockey": "佐久間", "horse": "キンパチティーチャ", "returnRate": 24.2, "investment": 56700, "returnAmount": 13700, "netProfit": -43000, "isKing": false },
+        { "rank": 7, "jockey": "櫛部", "horse": "ブームオレタ", "returnRate": 10.9, "investment": 140100, "returnAmount": 15310, "netProfit": -124790, "isKing": false },
+        { "rank": 8, "jockey": "中川", "horse": "ブラジリアンワックス", "returnRate": 10.3, "investment": 27900, "returnAmount": 2880, "netProfit": -25020, "isKing": false },
+        { "rank": 9, "jockey": "大橋", "horse": "アサミハズバンド", "returnRate": 1.0, "investment": 78400, "returnAmount": 750, "netProfit": -77650, "isKing": false },
+        { "rank": 10, "jockey": "住田", "horse": "アラキノブヨシ", "returnRate": 0.1, "investment": 252900, "returnAmount": 260, "netProfit": -252640, "isKing": true }
+      ]
+    },
+    {
+      "id": "4",
+      "edition": "第4回",
+      "name": "鶯谷杯 小倉2026",
+      "date": "2026/02/22",
+      "venue": "小倉",
+      "champion": {
+        "jockey": "原田",
+        "horse": "ウグイスバレー",
+        "returnRate": 311.9,
+        "netProfit": 77120,
+        "investment": 36400,
+        "returnAmount": 113520
+      },
+      "king": {
+        "jockey": "伊藤",
+        "horse": "チヂレプレジデント",
+        "investment": 190000
+      },
+      "results": [
+        { "rank": 1, "jockey": "原田", "horse": "ウグイスバレー", "returnRate": 311.9, "investment": 36400, "returnAmount": 113520, "netProfit": 77120, "isKing": false },
+        { "rank": 2, "jockey": "大橋", "horse": "アサミハズバンド", "returnRate": 152.4, "investment": 94000, "returnAmount": 143260, "netProfit": 49260, "isKing": false },
+        { "rank": 3, "jockey": "櫛部", "horse": "オオサカオデムカエ", "returnRate": 110.0, "investment": 75000, "returnAmount": 82470, "netProfit": 7470, "isKing": false },
+        { "rank": 4, "jockey": "安井", "horse": "エセドバイオー", "returnRate": 107.9, "investment": 178000, "returnAmount": 192000, "netProfit": 14000, "isKing": false },
+        { "rank": 5, "jockey": "岡本", "horse": "チェンジドライバ", "returnRate": 80.9, "investment": 60000, "returnAmount": 48560, "netProfit": -11440, "isKing": false },
+        { "rank": 6, "jockey": "佐久間", "horse": "キンパチティーチャ", "returnRate": 71.7, "investment": 79900, "returnAmount": 57290, "netProfit": -22610, "isKing": false },
+        { "rank": 7, "jockey": "矢橋", "horse": "ニンゲンビレッジ", "returnRate": 66.8, "investment": 152400, "returnAmount": 101860, "netProfit": -50540, "isKing": false },
+        { "rank": 8, "jockey": "富田", "horse": "ハンケントミタ", "returnRate": 62.9, "investment": 47600, "returnAmount": 29930, "netProfit": -17670, "isKing": false },
+        { "rank": 9, "jockey": "土坂", "horse": "ナイスネーチャン", "returnRate": 41.9, "investment": 43000, "returnAmount": 18000, "netProfit": -25000, "isKing": false },
+        { "rank": 10, "jockey": "大久保", "horse": "オオクボハグルマ", "returnRate": 38.6, "investment": 88000, "returnAmount": 34000, "netProfit": -54000, "isKing": false },
+        { "rank": 11, "jockey": "稲葉", "horse": "サイレントイナバ", "returnRate": 22.9, "investment": 39000, "returnAmount": 8950, "netProfit": -30050, "isKing": false },
+        { "rank": 12, "jockey": "伊藤", "horse": "チヂレプレジデント", "returnRate": 6.3, "investment": 190000, "returnAmount": 12000, "netProfit": -178000, "isKing": true }
+      ]
+    }
+  ]
+}

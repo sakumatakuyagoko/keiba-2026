@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 1600px;
+      height: 471px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 32px 50px 30px 50px;
+      font-family: "Hiragino Kaku Gothic ProN", "Meiryo", "BIZ UDPGothic", "Yu Gothic", sans-serif;
+      overflow: hidden;
+    }
+    /* Top Row */
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 190px;
+      position: relative;
+    }
+    /* Station Number Box */
+    .station-number {
+      width: 110px;
+      height: 120px;
+      border: 6px solid #111111;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .station-number .line {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      line-height: 1;
+      color: #111111;
+      margin-bottom: 2px;
+    }
+    .station-number .number {
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1;
+      color: #111111;
+    }
+
+    /* Center Main Name */
+    .center-title-container {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .main-title {
+      font-size: 130px;
+      font-weight: 900;
+      color: #050505;
+      letter-spacing: 36px;
+      margin-right: -36px;
+      line-height: 1.1;
+      font-family: "BIZ UDPMincho", "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", serif, "Hiragino Kaku Gothic ProN";
+    }
+    .sub-kana {
+      font-size: 38px;
+      font-weight: 800;
+      color: #1a1a1a;
+      letter-spacing: 12px;
+      margin-top: 2px;
+    }
+
+    /* Yamanote Area Badge */
+    .area-badge {
+      width: 110px;
+      height: 90px;
+      border: 5px solid #111111;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      padding-left: 6px;
+      color: #111111;
+    }
+
+    /* Green Line Bar */
+    .bar-row {
+      position: relative;
+      height: 64px;
+      width: 100%;
+      margin: 12px 0 16px 0;
+      display: flex;
+      align-items: center;
+    }
+    .green-arrow-bar {
+      width: 100%;
+      height: 64px;
+      background-color: #27853f;
+      clip-path: polygon(
+        32px 0%,
+        100% 0%,
+        calc(100% - 32px) 50%,
+        100% 100%,
+        32px 100%,
+        0% 50%
+      );
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .accent-block {
+      width: 68px;
+      height: 100%;
+      background-color: #92d050;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .bar-label-right {
+      position: absolute;
+      right: 120px;
+      color: #ffffff;
+      font-size: 46px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      display: flex;
+      align-items: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* Bottom Row */
+    .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 80px;
+      padding: 0 40px;
+    }
+    .date-box {
+      font-size: 38px;
+      font-weight: 900;
+      color: #111111;
+      line-height: 1.1;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .date-year {
+      font-size: 44px;
+      letter-spacing: 2px;
+    }
+    .date-day {
+      font-size: 34px;
+      letter-spacing: 1px;
+    }
+    .english-title {
+      font-size: 56px;
+      font-weight: 900;
+      color: #111111;
+      letter-spacing: 2px;
+      font-family: Arial, Helvetica, sans-serif;
+      margin-bottom: 2px;
+    }
+    .station-number-small {
+      width: 54px;
+      height: 58px;
+      border: 4px solid #111111;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+    }
+    .station-number-small .line {
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .station-number-small .number {
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .bottom-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 34px;
+      font-weight: 900;
+      color: #111111;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Row -->
+  <div class="top-row">
+    <div class="station-number">
+      <div class="line">JY</div>
+      <div class="number">06</div>
+    </div>
+    <div class="center-title-container">
+      <div class="main-title">鶯 谷 杯</div>
+      <div class="sub-kana">うぐいすだにカップ</div>
+    </div>
+    <div class="area-badge">山 区</div>
+  </div>
+
+  <!-- Center Arrow Bar -->
+  <div class="bar-row">
+    <div class="green-arrow-bar">
+      <div class="accent-block"></div>
+      <div class="bar-label-right">@京都</div>
+    </div>
+  </div>
+
+  <!-- Bottom Row -->
+  <div class="bottom-row">
+    <div class="date-box">
+      <div class="date-year">2026</div>
+      <div class="date-day">Oct.11</div>
+    </div>
+    <div class="english-title">Uguisudani Cup</div>
+    <div class="bottom-right">
+      <span>Kyoto</span>
+      <div class="station-number-small">
+        <div class="line">JY</div>
+        <div class="number">07</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

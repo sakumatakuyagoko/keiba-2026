@@ -15,14 +15,14 @@ import Link from "next/link";
 import { fetchBets, fetchUsers, fetchSystemStatus } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { CelebrationOverlay } from "@/components/CelebrationOverlay";
+import { HistoryModal } from "@/components/HistoryModal";
 import Image from "next/image";
+import { Trophy } from "lucide-react";
 
 // Fixed Order List
-// Fixed Order List (Jockey Name)
 const ORDERED_JOCKEYS = [
-  "原田", "矢橋", "岡本", "安井",
-  "稲葉", "櫛部", "土坂", "伊藤",
-  "冨田", "大橋", "大久保", "佐久間"
+  "原田", "矢橋", "佐久間", "伊藤",
+  "冨田", "大橋", "櫛部"
 ];
 
 export default function Home() {
@@ -40,6 +40,7 @@ export default function Home() {
   const [isBettingClosed, setIsBettingClosed] = useState(false);
   const [showClosedAlert, setShowClosedAlert] = useState(false);
   const [celebrationType, setCelebrationType] = useState<'win' | 'loss' | null>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   // Load User from LocalStorage on mount
   useEffect(() => {
@@ -235,19 +236,29 @@ export default function Home() {
 
         <h1 className="z-10 flex items-center h-full">
           <Image
-            src="/logo.png"
+            src="/logo.svg"
             alt="鶯谷杯"
             width={352}
             height={70}
             className="h-[70px] w-auto object-contain"
           />
         </h1>
-        <Link href="/login" className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors border border-white/20 z-10">
-          <UserIcon className="w-5 h-5 text-yellow-500" />
-          <span className="text-sm font-bold truncate max-w-[120px]">
-            {currentUser ? currentUser.name : "ログイン"}
-          </span>
-        </Link>
+        <div className="flex items-center gap-2 z-10">
+          <button
+            onClick={() => setIsHistoryOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-yellow-600/30 to-amber-600/30 hover:from-yellow-600/50 hover:to-amber-600/50 backdrop-blur-sm rounded-full transition-all border border-yellow-500/40 text-yellow-300 font-bold text-xs sm:text-sm shadow-md"
+            title="歴代大会の記録を見る"
+          >
+            <Trophy className="w-4 h-4 text-yellow-400" />
+            <span>歴代記録</span>
+          </button>
+          <Link href="/login" className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors border border-white/20">
+            <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+            <span className="text-xs sm:text-sm font-bold truncate max-w-[90px] sm:max-w-[120px]">
+              {currentUser ? currentUser.name : "ログイン"}
+            </span>
+          </Link>
+        </div>
       </header>
 
       {/* Ticker */}
@@ -386,6 +397,13 @@ export default function Home() {
       <CelebrationOverlay
         type={celebrationType}
         onClose={() => setCelebrationType(null)}
+      />
+
+      <HistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        currentLeaderboard={leaderboard}
+        currentUser={currentUser}
       />
     </div>
   );

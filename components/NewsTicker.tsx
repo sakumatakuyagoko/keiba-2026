@@ -29,7 +29,7 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
         const user = users.find(u => u.id === bet.userId);
         const race = MOCK_RACES.find(r => r.id === bet.raceId);
         const raceName = race
-            ? `${race.location === "Kokura" ? "小倉" : race.location === "Tokyo" ? "東京" : "阪神"}${race.raceNumber}R`
+            ? `${race.location === "Kyoto" ? "京都" : "東京"}${race.raceNumber}R`
             : bet.raceId;
 
         const profit = bet.returnAmount - bet.investment;

@@ -1,0 +1,226 @@
+{
+  "tournament": "第4回 鶯谷杯 小倉2026",
+  "date": "2026-02-22",
+  "ranked": [
+    {
+      "id": "86bc0872-99ad-460c-852a-0b44d92660eb",
+      "name": "ウグイスバレー",
+      "jockey": "原田",
+      "totalInvestment": 36400,
+      "totalReturn": 113520,
+      "netProfit": 77120,
+      "returnRate": 311.9,
+      "betCount": 13,
+      "rank": 1,
+      "isKing": false
+    },
+    {
+      "id": "2777928a-ba50-43c2-b6c0-a696cd507c54",
+      "name": "アサミハズバンド",
+      "jockey": "大橋",
+      "totalInvestment": 94000,
+      "totalReturn": 143260,
+      "netProfit": 49260,
+      "returnRate": 152.4,
+      "betCount": 12,
+      "rank": 2,
+      "isKing": false
+    },
+    {
+      "id": "4d3f61f9-91f3-437a-aa4b-ad09aeb92a13",
+      "name": "オオサカオデムカエ",
+      "jockey": "櫛部",
+      "totalInvestment": 75000,
+      "totalReturn": 82470,
+      "netProfit": 7470,
+      "returnRate": 110,
+      "betCount": 13,
+      "rank": 3,
+      "isKing": false
+    },
+    {
+      "id": "03d23dfd-71b0-44c8-8c47-e4fa16353b79",
+      "name": "エセドバイオー",
+      "jockey": "安井",
+      "totalInvestment": 178000,
+      "totalReturn": 192000,
+      "netProfit": 14000,
+      "returnRate": 107.9,
+      "betCount": 12,
+      "rank": 4,
+      "isKing": false
+    },
+    {
+      "id": "326f6ac1-0ae1-4af8-83ac-bcf9722645f0",
+      "name": "チェンジドライバ",
+      "jockey": "岡本",
+      "totalInvestment": 60000,
+      "totalReturn": 48560,
+      "netProfit": -11440,
+      "returnRate": 80.9,
+      "betCount": 13,
+      "rank": 5,
+      "isKing": false
+    },
+    {
+      "id": "b38e43f6-4932-4a4b-8601-0cea292c25e5",
+      "name": "キンパチティーチャ",
+      "jockey": "佐久間",
+      "totalInvestment": 79900,
+      "totalReturn": 57290,
+      "netProfit": -22610,
+      "returnRate": 71.7,
+      "betCount": 32,
+      "rank": 6,
+      "isKing": false
+    },
+    {
+      "id": "ef735080-68d7-4caa-b26c-97d93e4837ec",
+      "name": "ニンゲンビレッジ",
+      "jockey": "矢橋",
+      "totalInvestment": 152400,
+      "totalReturn": 101860,
+      "netProfit": -50540,
+      "returnRate": 66.8,
+      "betCount": 14,
+      "rank": 7,
+      "isKing": false
+    },
+    {
+      "id": "61853a0a-09c2-4e90-8cc7-f8a89acb9a0f",
+      "name": "ハンケントミタ",
+      "jockey": "富田",
+      "totalInvestment": 47600,
+      "totalReturn": 29930,
+      "netProfit": -17670,
+      "returnRate": 62.9,
+      "betCount": 12,
+      "rank": 8,
+      "isKing": false
+    },
+    {
+      "id": "cb30e26a-a45d-41ec-9e0b-a89d4e04260e",
+      "name": "ナイスネーチャン",
+      "jockey": "土坂",
+      "totalInvestment": 43000,
+      "totalReturn": 18000,
+      "netProfit": -25000,
+      "returnRate": 41.9,
+      "betCount": 7,
+      "rank": 9,
+      "isKing": false
+    },
+    {
+      "id": "4d6e12e8-d00f-449b-a880-7b3a549310fb",
+      "name": "オオクボハグルマ",
+      "jockey": "大久保",
+      "totalInvestment": 88000,
+      "totalReturn": 34000,
+      "netProfit": -54000,
+      "returnRate": 38.6,
+      "betCount": 7,
+      "rank": 10,
+      "isKing": false
+    },
+    {
+      "id": "86ce9bef-484d-47b8-80a0-cde50f8e5350",
+      "name": "サイレントイナバ",
+      "jockey": "稲葉",
+      "totalInvestment": 39000,
+      "totalReturn": 8950,
+      "netProfit": -30050,
+      "returnRate": 22.9,
+      "betCount": 10,
+      "rank": 11,
+      "isKing": false
+    },
+    {
+      "id": "cb4d19ba-cc64-497a-a32e-3086068df8d7",
+      "name": "チヂレプレジデント",
+      "jockey": "伊藤",
+      "totalInvestment": 190000,
+      "totalReturn": 12000,
+      "netProfit": -178000,
+      "returnRate": 6.3,
+      "betCount": 10,
+      "rank": 12,
+      "isKing": true
+    }
+  ],
+  "allBetsCount": 187,
+  "validBetsCount": 155,
+  "users": [
+    {
+      "id": "cb30e26a-a45d-41ec-9e0b-a89d4e04260e",
+      "name": "ナイスネーチャン",
+      "jockey": "土坂",
+      "pin": "0000"
+    },
+    {
+      "id": "cb4d19ba-cc64-497a-a32e-3086068df8d7",
+      "name": "チヂレプレジデント",
+      "jockey": "伊藤",
+      "pin": "0000"
+    },
+    {
+      "id": "86bc0872-99ad-460c-852a-0b44d92660eb",
+      "name": "ウグイスバレー",
+      "jockey": "原田",
+      "pin": "4665"
+    },
+    {
+      "id": "03d23dfd-71b0-44c8-8c47-e4fa16353b79",
+      "name": "エセドバイオー",
+      "jockey": "安井",
+      "pin": "1111"
+    },
+    {
+      "id": "b38e43f6-4932-4a4b-8601-0cea292c25e5",
+      "name": "キンパチティーチャ",
+      "jockey": "佐久間",
+      "pin": "1122"
+    },
+    {
+      "id": "4d3f61f9-91f3-437a-aa4b-ad09aeb92a13",
+      "name": "オオサカオデムカエ",
+      "jockey": "櫛部",
+      "pin": "0516"
+    },
+    {
+      "id": "86ce9bef-484d-47b8-80a0-cde50f8e5350",
+      "name": "サイレントイナバ",
+      "jockey": "稲葉",
+      "pin": "3203"
+    },
+    {
+      "id": "2777928a-ba50-43c2-b6c0-a696cd507c54",
+      "name": "アサミハズバンド",
+      "jockey": "大橋",
+      "pin": "1215"
+    },
+    {
+      "id": "4d6e12e8-d00f-449b-a880-7b3a549310fb",
+      "name": "オオクボハグルマ",
+      "jockey": "大久保",
+      "pin": "5533"
+    },
+    {
+      "id": "61853a0a-09c2-4e90-8cc7-f8a89acb9a0f",
+      "name": "ハンケントミタ",
+      "jockey": "富田",
+      "pin": "0502"
+    },
+    {
+      "id": "ef735080-68d7-4caa-b26c-97d93e4837ec",
+      "name": "ニンゲンビレッジ",
+      "jockey": "矢橋",
+      "pin": "1234"
+    },
+    {
+      "id": "326f6ac1-0ae1-4af8-83ac-bcf9722645f0",
+      "name": "チェンジドライバ",
+      "jockey": "岡本",
+      "pin": "1029"
+    }
+  ]
+}

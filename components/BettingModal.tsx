@@ -18,11 +18,9 @@ interface BettingModalProps {
 }
 
 // Fixed Order List
-// Fixed Order List (Jockey Name)
 const ORDERED_JOCKEYS = [
-    "原田", "矢橋", "岡本", "安井",
-    "稲葉", "櫛部", "土坂", "伊藤",
-    "冨田", "大橋", "大久保", "佐久間"
+    "原田", "矢橋", "佐久間", "伊藤",
+    "冨田", "大橋", "櫛部"
 ];
 
 export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initialData, isBettingClosed = false }: BettingModalProps) {
@@ -31,7 +29,7 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
     // Form State
-    const [selectedLocation, setSelectedLocation] = useState<"Kokura" | "Tokyo" | "Hanshin">("Kokura");
+    const [selectedLocation, setSelectedLocation] = useState<"Kyoto" | "Tokyo">("Kyoto");
     const [selectedRaceNum, setSelectedRaceNum] = useState<number>(11);
     const [investment, setInvestment] = useState<string>("");
     const [returnAmount, setReturnAmount] = useState<string>("");
@@ -70,7 +68,7 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
                 setCurrentUser(u); // Auto-login if editing
             }
 
-            // Parse raceId (e.g. "k01" -> location="Kokura", num=1)
+            // Parse raceId (e.g. "k01" -> location="Kyoto", num=1)
             const r = MOCK_RACES.find(mr => mr.id === initialData.raceId);
             if (r) {
                 setSelectedLocation(r.location);
@@ -273,7 +271,7 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
                             <div className="space-y-2">
                                 <label className="text-xs text-white/50 uppercase">レース場・R</label>
                                 <div className="flex gap-2 p-1 bg-gray-800 rounded-xl">
-                                    {(["Kokura", "Tokyo", "Hanshin"] as const).map(loc => (
+                                    {(["Kyoto", "Tokyo"] as const).map(loc => (
                                         <button
                                             key={loc}
                                             onClick={() => setSelectedLocation(loc)}
@@ -282,7 +280,7 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
                                                 selectedLocation === loc ? "bg-white text-black shadow-lg transform scale-105" : "text-white/50 hover:text-white hover:bg-white/5"
                                             )}
                                         >
-                                            {loc === "Kokura" ? "小倉" : loc === "Tokyo" ? "東京" : "阪神"}
+                                            {loc === "Kyoto" ? "京都" : "東京"}
                                         </button>
                                     ))}
                                 </div>

@@ -9,13 +9,14 @@ create table users (
   color text              -- Theme color (optional)
 );
 
--- 2. Races (Master Data for 2026/02/22)
-create table races (
-  id uuid default gen_random_uuid() primary key,
-  location text not null, -- 'Kokura', 'Tokyo', 'Hanshin'
+-- 2. Races (Master Data for 2026/10/11 Kyoto & Tokyo)
+create table if not exists races (
+  id text primary key,
+  location text not null, -- 'Kyoto', 'Tokyo'
   race_number int not null,
   name text,
-  start_time timestamp with time zone
+  conditions text,
+  start_time text
 );
 
 -- 3. Bets (Transactions)

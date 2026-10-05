@@ -9,11 +9,9 @@ import clsx from "clsx";
 import { ArrowLeft, User as UserIcon, Lock, Edit2, LogOut } from "lucide-react";
 
 // Fixed Order List (Should handle this centrally but simpler to copy for now or export)
-// Fixed Order List (Jockey Name)
 const ORDERED_JOCKEYS = [
-    "原田", "矢橋", "岡本", "安井",
-    "稲葉", "櫛部", "土坂", "伊藤",
-    "冨田", "大橋", "大久保", "佐久間"
+    "原田", "矢橋", "佐久間", "伊藤",
+    "冨田", "大橋", "櫛部"
 ];
 
 export default function LoginPage() {

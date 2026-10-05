@@ -1,8 +1,7 @@
-# SAPPORO KEIBA 2026 - Realtime Tracker
+# KYOTO KEIBA 2026 (鶯谷杯 京都2026) - Realtime Tracker
 
 ## Overview
 A Next.js application for tracking horse racing investment results among friends.
-Currently running in **Mock Mode** (Data resets on reload).
 
 ## How to Run
 

@@ -201,7 +201,7 @@ export function RankingCard({ entry, index, currentUser, className, onEditBet, l
                                         const race = MOCK_RACES.find(r => r.id === bet.raceId);
                                         let raceName = bet.raceId;
                                         if (race) {
-                                            const locName = race.location === "Kokura" ? "小倉" : race.location === "Tokyo" ? "東京" : "阪神";
+                                            const locName = race.location === "Kyoto" ? "京都" : "東京";
                                             raceName = `${locName}${race.raceNumber}R`;
                                         }
 

@@ -6,8 +6,8 @@ import clsx from "clsx";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Sapporo Keiba 2026",
-  description: "Realtime Horse Racing Tracker",
+  title: "鶯谷杯 京都2026 | Realtime Tracker",
+  description: "第5回 鶯谷杯 京都2026 リアルタイム戦績トラッカー",
 };
 
 export const viewport = {
