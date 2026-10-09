@@ -82,7 +82,7 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
                 className="flex gap-12 px-6 shrink-0"
                 initial={{ x: 0 }}
                 animate={{ x: "-100%" }}
-                transition={{ repeat: Infinity, duration: customMessage ? 120 : 100, ease: "linear" }}
+                transition={{ repeat: Infinity, duration: customMessage ? 96 : 80, ease: "linear" }}
             >
                 {customMessage ? renderCustomContent() : renderBets()}
             </motion.div>
@@ -90,7 +90,7 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
                 className="flex gap-12 px-6 shrink-0"
                 initial={{ x: 0 }}
                 animate={{ x: "-100%" }}
-                transition={{ repeat: Infinity, duration: customMessage ? 120 : 100, ease: "linear" }}
+                transition={{ repeat: Infinity, duration: customMessage ? 96 : 80, ease: "linear" }}
             >
                 {customMessage ? renderCustomContent() : renderBets()}
             </motion.div>
