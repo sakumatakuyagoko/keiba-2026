@@ -41,12 +41,12 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
             ? `${race.location === "Kyoto" ? "京都" : "東京"}${race.raceNumber}R`
             : bet.raceId;
 
-        // Show only the rate of the race (amounts are private)
-        const ratePct = Math.round(((bet.returnAmount - bet.investment) / bet.investment) * 100);
-        const kind: "win" | "even" | "lose" = ratePct > 0 ? "win" : ratePct < 0 ? "lose" : "even";
-        const label = kind === "win" ? `WIN +${ratePct}%`
-            : kind === "lose" ? `LOSE △${Math.abs(ratePct)}%`
-            : "EVEN ±0%";
+        // Same basis as the ranking (return / investment); amounts stay private
+        const ratePct = Math.round((bet.returnAmount / bet.investment) * 100);
+        const kind: "win" | "even" | "lose" = bet.returnAmount > bet.investment ? "win" : bet.returnAmount < bet.investment ? "lose" : "even";
+        const label = kind === "win" ? `WIN ${ratePct}%`
+            : kind === "lose" ? `LOSE ${ratePct}%`
+            : "EVEN 100%";
 
         return (
             <div key={`${bet.id}-${i}`} className="flex items-center gap-2 text-lg font-bold shrink-0">
