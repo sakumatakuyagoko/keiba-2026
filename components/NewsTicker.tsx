@@ -14,8 +14,16 @@ interface NewsTickerProps {
 export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
 
 
-    // Get latest 5 bets
-    const sourceBets = [...bets].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
+    // Get latest 5 bets. A corrected report overwrites the old one,
+    // so keep only the newest bet per user + race.
+    const sortedBets = [...bets].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    const seen = new Set<string>();
+    const sourceBets = sortedBets.filter(bet => {
+        const key = `${bet.userId}|${bet.raceId}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    }).slice(0, 5);
 
     // Ensure we have enough content to scroll smoothly. 
     // If only 1-2 bets, duplication helps. 
