@@ -292,6 +292,7 @@ export default function LoginPage() {
                                         placeholder="PIN"
                                     />
                                 </div>
+                                <p className="text-sm text-yellow-200 font-bold">好きな4ケタを登録。もし忘れたら管理者へ！</p>
                                 <button
                                     onClick={handleLogin}
                                     disabled={loading}
@@ -322,6 +323,7 @@ export default function LoginPage() {
                                         className="w-full p-3 bg-white text-black font-bold rounded-lg font-mono text-lg"
                                         placeholder="（半角数字4ケタ）"
                                     />
+                                    <p className="text-sm text-yellow-200 font-bold">好きな4ケタを登録。もし忘れたら管理者へ！</p>
                                 </div>
 
                                 <button
