@@ -61,36 +61,36 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
                     onClick={onClose}
                 >
                     <motion.div
-                        className="w-full max-w-md max-h-[85vh] overflow-y-auto bg-gray-900 text-white rounded-xl border border-white/10 shadow-2xl"
+                        className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-gray-900 text-white rounded-xl border border-white/10 shadow-2xl"
                         initial={{ y: 40 }}
                         animate={{ y: 0 }}
                         exit={{ y: 40 }}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="sticky top-0 flex items-center justify-between bg-gray-900 px-5 py-3 border-b border-white/10">
-                            <h2 className="font-bold text-lg">📖 使い方</h2>
+                            <h2 className="font-bold text-2xl">📖 使い方</h2>
                             <button onClick={onClose} aria-label="閉じる" className="p-1 text-gray-400 hover:text-white">
-                                <X className="w-5 h-5" />
+                                <X className="w-7 h-7" />
                             </button>
                         </div>
 
-                        <div className="p-5 space-y-5 text-sm">
+                        <div className="p-5 space-y-6 text-lg leading-relaxed">
                             <p className="text-gray-300">
                                 レースごとの投資額・回収額を報告して、みんなの回収率ランキングをリアルタイムで競うアプリです。
                             </p>
 
                             {STEPS.map((s) => (
                                 <section key={s.title}>
-                                    <h3 className="font-bold text-yellow-400 mb-1">{s.title}</h3>
-                                    <ul className="list-disc pl-5 space-y-1 text-gray-200">
+                                    <h3 className="font-bold text-yellow-400 text-xl mb-2">{s.title}</h3>
+                                    <ul className="list-disc pl-6 space-y-2 text-gray-200">
                                         {s.body.map((b) => <li key={b}>{b}</li>)}
                                     </ul>
                                 </section>
                             ))}
 
                             <section>
-                                <h3 className="font-bold text-yellow-400 mb-1">よくある質問</h3>
-                                <dl className="space-y-2">
+                                <h3 className="font-bold text-yellow-400 text-xl mb-2">よくある質問</h3>
+                                <dl className="space-y-3">
                                     {FAQ.map((f) => (
                                         <div key={f.q}>
                                             <dt className="font-bold">Q. {f.q}</dt>
@@ -100,7 +100,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
                                 </dl>
                             </section>
 
-                            <button onClick={onClose} className="w-full bg-white text-black font-bold py-2 rounded-lg hover:bg-gray-200">
+                            <button onClick={onClose} className="w-full bg-white text-black font-bold py-3 text-lg rounded-lg hover:bg-gray-200">
                                 閉じる
                             </button>
                         </div>
