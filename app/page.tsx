@@ -128,9 +128,7 @@ export default function Home() {
               setToast({ kind: "lose", message: `💧 ${reporter.name}さん ${raceName} LOSE ${Math.round((returnAmount / investment) * 100)}%` });
             } else if (investment > 0) {
               setToast({ kind: "even", message: `😐 ${reporter.name}さん ${raceName} EVEN 100%` });
-            } else {
-              setToast({ kind: "info", message: `🏇 ${reporter.name}さんが ${raceName} を報告！` });
-            }
+            } // no investment -> no notification
           }
         }
       })
@@ -370,6 +368,7 @@ export default function Home() {
               key={entry.id}
               entry={entry}
               index={index}
+              totalCount={leaderboard.length}
               currentUser={currentUser}
               onEditBet={handleEditBet}
               lastBetUpdate={lastBetUpdate}
