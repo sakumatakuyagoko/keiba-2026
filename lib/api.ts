@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Bet, User } from './types';
+import { Bet, User, TournamentArchive } from './types';
 import { MOCK_USERS, MOCK_BETS } from './mock';
 
 // Allow fallback to mock if no ENV
@@ -33,18 +33,74 @@ export async function updateUserName(userId: string, newName: string) {
     return { error };
 }
 
-export async function createUser(name: string, jockey: string, pin: string = '0000') {
+export async function createUser(name: string, jockey: string, pin: string = '0000', sortOrder?: number) {
     if (useMock) return { error: null };
-    const { error } = await supabase.from('users').insert({ name, jockey, pin });
+    let { error } = await supabase.from('users').insert({ name, jockey, pin, sort_order: sortOrder });
+    // users.sort_order may not exist yet (supabase/update_v2.sql not applied) -> retry without it
+    if (error && /sort_order/.test(error.message)) {
+        ({ error } = await supabase.from('users').insert({ name, jockey, pin }));
+    }
     return { error };
 }
 
-// Deletes the user together with their bets (bets.user_id has a foreign key)
-export async function deleteUser(userId: string) {
+// Persist the display order (ids in the desired order)
+export async function updateUserOrder(ids: string[]) {
     if (useMock) return { error: null };
+    const results = await Promise.all(
+        ids.map((id, i) => supabase.from('users').update({ sort_order: i }).eq('id', id))
+    );
+    const failed = results.find(r => r.error);
+    return { error: failed ? failed.error : null };
+}
+
+// Raw DB rows of a deleted user, kept so the deletion can be undone
+export type DeletedUserSnapshot = {
+    user: Record<string, unknown>;
+    bets: Record<string, unknown>[];
+};
+
+// Deletes the user together with their bets (bets.user_id has a foreign key)
+export async function deleteUser(userId: string): Promise<{ error: { message: string } | null; snapshot?: DeletedUserSnapshot }> {
+    if (useMock) return { error: null };
+    const { data: userRow, error: userErr } = await supabase.from('users').select('*').eq('id', userId).single();
+    if (userErr || !userRow) return { error: userErr || { message: 'user not found' } };
+    const { data: betRows, error: betsFetchErr } = await supabase.from('bets').select('*').eq('user_id', userId);
+    if (betsFetchErr) return { error: betsFetchErr };
+
     const { error: betsError } = await supabase.from('bets').delete().eq('user_id', userId);
     if (betsError) return { error: betsError };
     const { error } = await supabase.from('users').delete().eq('id', userId);
+    if (error) return { error };
+    return { error: null, snapshot: { user: userRow, bets: betRows || [] } };
+}
+
+export async function restoreUser(snapshot: DeletedUserSnapshot) {
+    if (useMock) return { error: null };
+    const { error } = await supabase.from('users').insert(snapshot.user);
+    if (error) return { error };
+    if (snapshot.bets.length > 0) {
+        const { error: betsError } = await supabase.from('bets').insert(snapshot.bets);
+        if (betsError) return { error: betsError };
+    }
+    return { error: null };
+}
+
+// Tournament results saved when betting is closed (table: tournament_archives)
+export async function fetchSavedArchives(): Promise<TournamentArchive[]> {
+    if (useMock) return [];
+    const { data, error } = await supabase.from('tournament_archives').select('data');
+    if (error) {
+        console.error('Error fetching saved archives:', error);
+        return [];
+    }
+    return (data || []).map((r: { data: TournamentArchive }) => r.data);
+}
+
+export async function saveTournamentArchive(archive: TournamentArchive) {
+    if (useMock) return { error: null };
+    const { error } = await supabase
+        .from('tournament_archives')
+        .upsert({ id: archive.id, data: archive, updated_at: new Date().toISOString() });
     return { error };
 }
 

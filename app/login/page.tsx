@@ -1,5 +1,6 @@
 "use client";
 
+import { sortUsers } from "@/lib/users";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchUsers, updateUserPin, updateUserName } from "@/lib/api";
@@ -8,11 +9,6 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 import clsx from "clsx";
 import { ArrowLeft, User as UserIcon, Lock, Edit2, LogOut } from "lucide-react";
 
-// Fixed Order List (Should handle this centrally but simpler to copy for now or export)
-const ORDERED_JOCKEYS = [
-    "原田", "矢橋", "佐久間", "伊藤",
-    "冨田", "大橋", "櫛部"
-];
 
 export default function LoginPage() {
     const router = useRouter();
@@ -36,11 +32,7 @@ export default function LoginPage() {
         const loadData = async () => {
             const data = await fetchUsers();
             // Sort by ORDERED_JOCKEYS
-            const sorted = data.sort((a, b) => {
-                const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
-                const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
-                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-            });
+            const sorted = sortUsers(data);
             setUsers(sorted);
 
             // Check current login

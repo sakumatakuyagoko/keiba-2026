@@ -1,5 +1,6 @@
 "use client";
 
+import { sortUsers } from "@/lib/users";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Lock, Info } from "lucide-react";
@@ -17,11 +18,6 @@ interface BettingModalProps {
     isBettingClosed?: boolean;
 }
 
-// Fixed Order List
-const ORDERED_JOCKEYS = [
-    "原田", "矢橋", "佐久間", "伊藤",
-    "冨田", "大橋", "櫛部"
-];
 
 export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initialData, isBettingClosed = false }: BettingModalProps) {
     const [users, setUsers] = useState<User[]>(MOCK_USERS);
@@ -42,11 +38,7 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
         const load = async () => {
             const u = await fetchUsers();
             // Sort
-            const sorted = u.sort((a, b) => {
-                const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
-                const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
-                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-            });
+            const sorted = sortUsers(u);
             setUsers(sorted);
 
             const saved = localStorage.getItem('currentUser');
