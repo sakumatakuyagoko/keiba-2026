@@ -33,6 +33,21 @@ export async function updateUserName(userId: string, newName: string) {
     return { error };
 }
 
+export async function createUser(name: string, jockey: string, pin: string = '0000') {
+    if (useMock) return { error: null };
+    const { error } = await supabase.from('users').insert({ name, jockey, pin });
+    return { error };
+}
+
+// Deletes the user together with their bets (bets.user_id has a foreign key)
+export async function deleteUser(userId: string) {
+    if (useMock) return { error: null };
+    const { error: betsError } = await supabase.from('bets').delete().eq('user_id', userId);
+    if (betsError) return { error: betsError };
+    const { error } = await supabase.from('users').delete().eq('id', userId);
+    return { error };
+}
+
 export async function fetchBets(): Promise<Bet[]> {
     if (useMock) return MOCK_BETS;
 

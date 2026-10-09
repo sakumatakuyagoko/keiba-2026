@@ -362,6 +362,16 @@ export default function Home() {
       <AdminControls
         isAdmin={isAdmin}
         isBettingClosed={isBettingClosed}
+        users={users}
+        onUsersChanged={async () => {
+          const [u, b] = await Promise.all([fetchUsers(), fetchBets()]);
+          setUsers(u.sort((a, b) => {
+            const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
+            const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
+            return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+          }));
+          setBets(b);
+        }}
         onLogin={async (pass) => {
           if (pass === "1155") {
             setIsAdmin(true);
