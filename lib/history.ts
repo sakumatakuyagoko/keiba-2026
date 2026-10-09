@@ -3,6 +3,21 @@ import { TournamentArchive, TournamentResult, LeaderboardEntry } from './types';
 
 export const TOURNAMENT_ARCHIVES: TournamentArchive[] = archiveData.tournaments as TournamentArchive[];
 
+// 今回の大会の基本情報（次回大会では、ここを更新する）
+export const CURRENT_TOURNAMENT = {
+    id: "kyoto_2026",
+    edition: "第5回",
+    name: "第5回 鶯谷杯 京都2026",
+    date: "2026/10/11",
+    venue: "京都",
+};
+
+// 締切時にDBへ保存された大会結果（アプリ起動時に読み込む）
+let savedArchives: TournamentArchive[] = [];
+export function setSavedArchives(archives: TournamentArchive[]) {
+    savedArchives = archives;
+}
+
 // 殿堂入り集計
 export type HallOfFameStats = {
     jockey: string;
@@ -59,7 +74,7 @@ export type JockeyPersonalDetail = {
 };
 
 // 進行中の第5回（京都大会）データを TournamentArchive 形式に変換
-export function createKyotoTournament(currentLeaderboard?: LeaderboardEntry[]): TournamentArchive | null {
+export function createKyotoTournament(currentLeaderboard?: LeaderboardEntry[], opts?: { final?: boolean }): TournamentArchive | null {
     if (!currentLeaderboard || currentLeaderboard.length === 0) return null;
 
     const hasAnyBet = currentLeaderboard.some(e => e.totalInvestment > 0);
@@ -86,11 +101,11 @@ export function createKyotoTournament(currentLeaderboard?: LeaderboardEntry[]): 
     }));
 
     return {
-        id: "kyoto_2026",
-        edition: "第5回",
-        name: "第5回 鶯谷杯 京都2026（進行中）",
-        date: "2026/10/11",
-        venue: "京都",
+        id: CURRENT_TOURNAMENT.id,
+        edition: CURRENT_TOURNAMENT.edition,
+        name: opts?.final ? CURRENT_TOURNAMENT.name : `${CURRENT_TOURNAMENT.name}（進行中）`,
+        date: CURRENT_TOURNAMENT.date,
+        venue: CURRENT_TOURNAMENT.venue,
         champion: {
             jockey: top.jockey === "富田" ? "冨田" : top.jockey,
             horse: top.name,
@@ -114,15 +129,11 @@ export function getAllTournaments(currentLeaderboard?: LeaderboardEntry[]): {
     hasCurrentKyoto: boolean;
 } {
     const kyoto = createKyotoTournament(currentLeaderboard);
-    if (kyoto) {
-        return {
-            tournaments: [...TOURNAMENT_ARCHIVES, kyoto],
-            hasCurrentKyoto: true
-        };
-    }
+    // 進行中の大会は最新データを優先し、保存済みは同じ大会が無いときのみ使う
+    const saved = savedArchives.filter(a => a.id !== kyoto?.id);
     return {
-        tournaments: TOURNAMENT_ARCHIVES,
-        hasCurrentKyoto: false
+        tournaments: [...TOURNAMENT_ARCHIVES, ...saved, ...(kyoto ? [kyoto] : [])],
+        hasCurrentKyoto: !!kyoto
     };
 }
 

@@ -23,7 +23,8 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
-    }).slice(0, 5);
+    }).filter(bet => bet.investment > 0) // no investment -> no rate to show
+      .slice(0, 5);
 
     // Ensure we have enough content to scroll smoothly. 
     // If only 1-2 bets, duplication helps. 
@@ -40,8 +41,12 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
             ? `${race.location === "Kyoto" ? "京都" : "東京"}${race.raceNumber}R`
             : bet.raceId;
 
-        const profit = bet.returnAmount - bet.investment;
-        const isWin = profit > 0;
+        // Show only the rate of the race (amounts are private)
+        const ratePct = Math.round(((bet.returnAmount - bet.investment) / bet.investment) * 100);
+        const kind: "win" | "even" | "lose" = ratePct > 0 ? "win" : ratePct < 0 ? "lose" : "even";
+        const label = kind === "win" ? `WIN +${ratePct}%`
+            : kind === "lose" ? `LOSE △${Math.abs(ratePct)}%`
+            : "EVEN ±0%";
 
         return (
             <div key={`${bet.id}-${i}`} className="flex items-center gap-2 text-lg font-bold shrink-0">
@@ -52,12 +57,9 @@ export function NewsTicker({ bets, users, customMessage }: NewsTickerProps) {
                 <span className="text-yellow-100 bg-gray-800 px-2 rounded text-sm mx-1 border border-gray-600">
                     {raceName}
                 </span>
-                <span className={isWin ? "text-yellow-400 text-xl flex items-center gap-1" : "text-gray-400"}>
-                    {isWin ? <TrendingUp className="w-5 h-5" /> : null}
-                    {isWin ? "WIN!" : ""}
-                </span>
-                <span className={isWin ? "text-yellow-400" : "text-gray-400"}>
-                    {profit > 0 ? "+" : ""}{profit.toLocaleString()}円
+                <span className={kind === "win" ? "text-yellow-400 text-xl flex items-center gap-1" : kind === "even" ? "text-white" : "text-gray-400"}>
+                    {kind === "win" ? <TrendingUp className="w-5 h-5" /> : null}
+                    {label}
                 </span>
             </div>
         );

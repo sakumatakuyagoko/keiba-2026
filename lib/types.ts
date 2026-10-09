@@ -4,6 +4,7 @@ export type User = {
     jockey: string; // Real Name
     pin: string;
     color: string;
+    sort_order?: number | null; // display order set by admin
 };
 
 export type Race = {

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { resetBets, updateSystemStatus, createUser, deleteUser } from "@/lib/api";
+import { useState, useEffect } from "react";
+import { resetBets, updateSystemStatus, createUser, deleteUser, restoreUser, updateUserOrder, DeletedUserSnapshot } from "@/lib/api";
 import { User } from "@/lib/types";
 import clsx from "clsx";
 
@@ -12,12 +12,32 @@ interface AdminControlsProps {
     isBettingClosed?: boolean; // New prop
     users?: User[];
     onUsersChanged?: () => void | Promise<void>;
+    onBettingClosed?: () => void | Promise<void>; // called after switching to the closed (result) mode
 }
 
-export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = false, users = [], onUsersChanged }: AdminControlsProps) {
+const UNDO_KEY = "lastDeletedUser";
+
+export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = false, users = [], onUsersChanged, onBettingClosed }: AdminControlsProps) {
     const [isMembersOpen, setIsMembersOpen] = useState(false);
     const [newJockey, setNewJockey] = useState("");
     const [newHorse, setNewHorse] = useState("");
+    const [undoSnapshot, setUndoSnapshot] = useState<DeletedUserSnapshot | null>(null);
+
+    // Keep the last deletion so it can be undone even after a reload
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(UNDO_KEY);
+            if (saved) setUndoSnapshot(JSON.parse(saved));
+        } catch { /* ignore */ }
+    }, []);
+
+    const rememberDeleted = (snap: DeletedUserSnapshot | null) => {
+        setUndoSnapshot(snap);
+        try {
+            if (snap) localStorage.setItem(UNDO_KEY, JSON.stringify(snap));
+            else localStorage.removeItem(UNDO_KEY);
+        } catch { /* ignore */ }
+    };
     const [isOpen, setIsOpen] = useState(false);
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
@@ -51,7 +71,8 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
             alert("ジョッキー名と馬名を入力してください。");
             return;
         }
-        const { error } = await createUser(horse, jockey);
+        const nextOrder = users.reduce((max, u) => Math.max(max, typeof u.sort_order === "number" ? u.sort_order : -1), users.length - 1) + 1;
+        const { error } = await createUser(horse, jockey, "0000", nextOrder);
         if (error) {
             alert("追加に失敗しました: " + error.message);
             return;
@@ -63,9 +84,36 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
 
     const handleDeleteUser = async (u: User) => {
         if (!confirm(`${u.name}【${u.jockey}】を出場者から削除しますか？\nこの人の投票データも全て消去されます。`)) return;
-        const { error } = await deleteUser(u.id);
+        const { error, snapshot } = await deleteUser(u.id);
         if (error) {
             alert("削除に失敗しました: " + error.message);
+            return;
+        }
+        if (snapshot) rememberDeleted(snapshot);
+        await onUsersChanged?.();
+    };
+
+    const undoName = undoSnapshot ? `${undoSnapshot.user.name}【${undoSnapshot.user.jockey}】` : "";
+
+    const handleUndoDelete = async () => {
+        if (!undoSnapshot) return;
+        const { error } = await restoreUser(undoSnapshot);
+        if (error) {
+            alert("元に戻せませんでした: " + error.message);
+            return;
+        }
+        rememberDeleted(null);
+        await onUsersChanged?.();
+    };
+
+    const handleMove = async (index: number, dir: -1 | 1) => {
+        const target = index + dir;
+        if (target < 0 || target >= users.length) return;
+        const ids = users.map(u => u.id);
+        [ids[index], ids[target]] = [ids[target], ids[index]];
+        const { error } = await updateUserOrder(ids);
+        if (error) {
+            alert("並び順を保存できませんでした。\nSupabaseで supabase/update_v2.sql を実行してください。\n" + error.message);
             return;
         }
         await onUsersChanged?.();
@@ -77,7 +125,9 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
             : "通常モードに戻りますか？\n＊戦績結果・変更が可能となります";
 
         if (confirm(message)) {
-            await updateSystemStatus(!isBettingClosed);
+            const closing = !isBettingClosed;
+            await updateSystemStatus(closing);
+            if (closing) await onBettingClosed?.();
             // Realtime subscription in parent will update the state
         }
     };
@@ -147,9 +197,13 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
                             onClick={e => e.stopPropagation()}>
                             <h3 className="text-white font-bold text-lg">出場者管理</h3>
                             <ul className="space-y-2">
-                                {users.map(u => (
-                                    <li key={u.id} className="flex items-center justify-between bg-black/40 rounded-lg px-3 py-2 text-white text-sm">
-                                        <span>{u.name}【{u.jockey}】</span>
+                                {users.map((u, i) => (
+                                    <li key={u.id} className="flex items-center justify-between gap-2 bg-black/40 rounded-lg px-3 py-2 text-white text-sm">
+                                        <span className="flex-1 min-w-0 truncate">{u.name}【{u.jockey}】</span>
+                                        <button onClick={() => handleMove(i, -1)} disabled={i === 0} aria-label="上へ"
+                                            className="bg-gray-700 hover:bg-gray-600 disabled:opacity-30 px-2 py-1 rounded">▲</button>
+                                        <button onClick={() => handleMove(i, 1)} disabled={i === users.length - 1} aria-label="下へ"
+                                            className="bg-gray-700 hover:bg-gray-600 disabled:opacity-30 px-2 py-1 rounded">▼</button>
                                         <button onClick={() => handleDeleteUser(u)}
                                             className="bg-red-600 hover:bg-red-500 text-xs font-bold px-3 py-1 rounded">
                                             削除
@@ -157,6 +211,12 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
                                     </li>
                                 ))}
                             </ul>
+                            {undoSnapshot && (
+                                <button onClick={handleUndoDelete}
+                                    className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 rounded-lg text-sm">
+                                    ↩ 削除を元に戻す（{undoName}）
+                                </button>
+                            )}
                             <div className="space-y-2 border-t border-white/10 pt-3">
                                 <div className="text-xs text-gray-400">新しい出場者を追加（初期PIN: 0000）</div>
                                 <input value={newJockey} onChange={e => setNewJockey(e.target.value)} placeholder="ジョッキー名（例: 伊藤）"

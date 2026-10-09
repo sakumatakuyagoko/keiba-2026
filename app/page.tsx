@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { sortUsers } from "@/lib/users";
+import { Toast } from "@/components/Toast";
+import { MOCK_RACES } from "@/lib/mock";
+import { createKyotoTournament, setSavedArchives } from "@/lib/history";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 
 import { RankingCard } from "@/components/RankingCard";
 import { BettingModal } from "@/components/BettingModal";
@@ -12,7 +16,7 @@ import { LeaderboardEntry, Bet, User } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, User as UserIcon, Star } from "lucide-react";
 import Link from "next/link";
-import { fetchBets, fetchUsers, fetchSystemStatus } from "@/lib/api";
+import { fetchBets, fetchUsers, fetchSystemStatus, fetchSavedArchives, saveTournamentArchive } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { CelebrationOverlay } from "@/components/CelebrationOverlay";
 import { HistoryModal } from "@/components/HistoryModal";
@@ -20,11 +24,6 @@ import { HelpModal } from "@/components/HelpModal";
 import Image from "next/image";
 import { Trophy, HelpCircle } from "lucide-react";
 
-// Fixed Order List
-const ORDERED_JOCKEYS = [
-  "原田", "矢橋", "佐久間", "伊藤",
-  "冨田", "大橋", "櫛部"
-];
 
 export default function Home() {
   const [bets, setBets] = useState<Bet[]>([]);
@@ -43,6 +42,26 @@ export default function Home() {
   const [celebrationType, setCelebrationType] = useState<'win' | 'loss' | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [, setArchivesVersion] = useState(0); // re-render after saved results load
+  const closeToast = useCallback(() => setToast(null), []);
+
+  // Latest values for the realtime handlers (subscribed once)
+  const usersRef = useRef<User[]>(users);
+  const currentUserRef = useRef<User | null>(currentUser);
+  useEffect(() => { usersRef.current = users; }, [users]);
+  useEffect(() => { currentUserRef.current = currentUser; }, [currentUser]);
+
+  // Results saved when a past tournament was closed
+  useEffect(() => {
+    fetchSavedArchives().then(a => { setSavedArchives(a); setArchivesVersion(v => v + 1); });
+  }, []);
+
+  const reloadUsersAndBets = async () => {
+    const [u, b] = await Promise.all([fetchUsers(), fetchBets()]);
+    setUsers(sortUsers(u));
+    setBets(b);
+  };
 
   // Load User from LocalStorage on mount
   useEffect(() => {
@@ -56,11 +75,7 @@ export default function Home() {
       const [uArgs, bArgs, sysArgs] = await Promise.all([fetchUsers(), fetchBets(), fetchSystemStatus()]);
 
       // Sort users by ORDERED_JOCKEYS (Fixed order)
-      const sortedUsers = uArgs.sort((a, b) => {
-        const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
-        const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
-        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-      });
+      const sortedUsers = sortUsers(uArgs);
       setUsers(sortedUsers);
       setBets(bArgs);
       setIsBettingClosed(sysArgs.isBettingClosed);
@@ -98,6 +113,17 @@ export default function Home() {
         };
 
         setBets(prev => [...prev, mappedBet]);
+
+        // Notify others (no amounts)
+        if (mappedBet.userId !== currentUserRef.current?.id) {
+          const reporter = usersRef.current.find(u => u.id === mappedBet.userId);
+          const race = MOCK_RACES.find(r => r.id === mappedBet.raceId);
+          const raceName = race ? `${race.location === "Kyoto" ? "京都" : "東京"}${race.raceNumber}R` : "レース";
+          if (reporter) setToast(`🏇 ${reporter.name}さんが ${raceName} を報告！`);
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
+        reloadUsersAndBets(); // participants added / deleted / reordered by admin
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -374,14 +400,14 @@ export default function Home() {
         isAdmin={isAdmin}
         isBettingClosed={isBettingClosed}
         users={users}
-        onUsersChanged={async () => {
-          const [u, b] = await Promise.all([fetchUsers(), fetchBets()]);
-          setUsers(u.sort((a, b) => {
-            const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
-            const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
-            return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-          }));
-          setBets(b);
+        onUsersChanged={reloadUsersAndBets}
+        onBettingClosed={async () => {
+          // Save the final results to the history
+          const archive = createKyotoTournament(leaderboard, { final: true });
+          if (!archive) return;
+          const { error } = await saveTournamentArchive(archive);
+          if (error) alert("結果を歴代記録に保存できませんでした。\nSupabaseで supabase/update_v2.sql を実行してください。\n" + error.message);
+          else alert("最終結果を歴代記録に保存しました。");
         }}
         onLogin={async (pass) => {
           if (pass === "1155") {
@@ -389,11 +415,7 @@ export default function Home() {
 
             const u = await fetchUsers();
             // Sort by ORDERED_JOCKEYS (Fixed order)
-            const sortedUsers = u.sort((a, b) => {
-              const indexA = ORDERED_JOCKEYS.indexOf(a.jockey);
-              const indexB = ORDERED_JOCKEYS.indexOf(b.jockey);
-              return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-            });
+            const sortedUsers = sortUsers(u);
             setUsers(sortedUsers);
             const b = await fetchBets();
             setBets(b);
@@ -419,6 +441,8 @@ export default function Home() {
         type={celebrationType}
         onClose={() => setCelebrationType(null)}
       />
+
+      <Toast message={toast} onClose={closeToast} />
 
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
