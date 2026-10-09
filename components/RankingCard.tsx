@@ -11,6 +11,7 @@ import { MOCK_RACES } from "@/lib/mock";
 interface RankingCardProps extends HTMLMotionProps<"div"> {
     entry: LeaderboardEntry;
     index: number;
+    totalCount: number; // number of participants (decides the frame colors)
     currentUser: User | null;
     onEditBet?: (bet: Bet) => void;
     lastBetUpdate?: number;
@@ -28,23 +29,23 @@ const WAKU_BG_COLORS = [
     "bg-pink-400 text-black",   // 8
 ];
 
-const getWakuColorClass = (horseNumber: number) => {
-    // 12 Horses Logic
-    if (horseNumber === 1) return WAKU_BG_COLORS[0];
-    if (horseNumber === 2) return WAKU_BG_COLORS[1];
-    if (horseNumber === 3) return WAKU_BG_COLORS[2];
-    if (horseNumber === 4) return WAKU_BG_COLORS[3];
-    if (horseNumber === 5 || horseNumber === 6) return WAKU_BG_COLORS[4];
-    if (horseNumber === 7 || horseNumber === 8) return WAKU_BG_COLORS[5];
-    if (horseNumber === 9 || horseNumber === 10) return WAKU_BG_COLORS[6];
-    if (horseNumber === 11 || horseNumber === 12) return WAKU_BG_COLORS[7];
+// JRA frame (枠) rule: up to 8 horses -> one per frame; beyond that, the extra
+// horses are added to frames 8, 7, 6 ... (one each, repeating) so later frames double up.
+const getWakuColorClass = (horseNumber: number, total: number) => {
+    const sizes = Array(8).fill(1);
+    for (let extra = total - 8, f = 7; extra > 0; extra--, f = (f + 7) % 8) sizes[f]++;
+    let upTo = 0;
+    for (let f = 0; f < 8; f++) {
+        upTo += sizes[f];
+        if (horseNumber <= upTo) return WAKU_BG_COLORS[f];
+    }
     return "bg-gray-500";
 };
 
-export function RankingCard({ entry, index, currentUser, className, onEditBet, lastBetUpdate, ...props }: RankingCardProps) {
+export function RankingCard({ entry, index, totalCount, currentUser, className, onEditBet, lastBetUpdate, ...props }: RankingCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const horseNumber = index + 1;
-    const wakuClass = getWakuColorClass(horseNumber);
+    const wakuClass = getWakuColorClass(horseNumber, totalCount);
     const isMe = currentUser?.id === entry.id;
     const [history, setHistory] = useState<Bet[]>([]);
 
