@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { resetBets, updateSystemStatus } from "@/lib/api";
+import { resetBets, updateSystemStatus, createUser, deleteUser } from "@/lib/api";
+import { User } from "@/lib/types";
 import clsx from "clsx";
 
 interface AdminControlsProps {
@@ -9,9 +10,14 @@ interface AdminControlsProps {
     onLogin: (password: string) => boolean | Promise<boolean>;
     onLogout: () => void;
     isBettingClosed?: boolean; // New prop
+    users?: User[];
+    onUsersChanged?: () => void | Promise<void>;
 }
 
-export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = false }: AdminControlsProps) {
+export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = false, users = [], onUsersChanged }: AdminControlsProps) {
+    const [isMembersOpen, setIsMembersOpen] = useState(false);
+    const [newJockey, setNewJockey] = useState("");
+    const [newHorse, setNewHorse] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
@@ -36,6 +42,33 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
                 window.location.reload(); // Reload to refresh data
             }
         }
+    };
+
+    const handleAddUser = async () => {
+        const jockey = newJockey.trim();
+        const horse = newHorse.trim();
+        if (!jockey || !horse) {
+            alert("ジョッキー名と馬名を入力してください。");
+            return;
+        }
+        const { error } = await createUser(horse, jockey);
+        if (error) {
+            alert("追加に失敗しました: " + error.message);
+            return;
+        }
+        setNewJockey("");
+        setNewHorse("");
+        await onUsersChanged?.();
+    };
+
+    const handleDeleteUser = async (u: User) => {
+        if (!confirm(`${u.name}【${u.jockey}】を出場者から削除しますか？\nこの人の投票データも全て消去されます。`)) return;
+        const { error } = await deleteUser(u.id);
+        if (error) {
+            alert("削除に失敗しました: " + error.message);
+            return;
+        }
+        await onUsersChanged?.();
     };
 
     const handleToggleClose = async () => {
@@ -68,6 +101,12 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
                         ・全レースの投票ロックが解除されています<br />
                         ・「データ初期化」で練習データを消去できます
                     </div>
+                    <button
+                        onClick={() => setIsMembersOpen(true)}
+                        className="w-full mb-2 bg-gray-800 hover:bg-gray-700 border border-white/10 text-white font-bold py-2 rounded-lg text-sm"
+                    >
+                        👥 出場者の追加・削除
+                    </button>
                     <div className="flex gap-2">
                         <div className="flex bg-gray-800 rounded-lg p-1 border border-white/10">
                             <button
@@ -101,6 +140,39 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
                         </button>
                     </div>
                 </div>
+                {isMembersOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm pointer-events-auto"
+                        onClick={() => setIsMembersOpen(false)}>
+                        <div className="w-full max-w-sm max-h-[85vh] overflow-y-auto bg-gray-900 p-5 rounded-xl border border-white/10 shadow-2xl space-y-4"
+                            onClick={e => e.stopPropagation()}>
+                            <h3 className="text-white font-bold text-lg">出場者管理</h3>
+                            <ul className="space-y-2">
+                                {users.map(u => (
+                                    <li key={u.id} className="flex items-center justify-between bg-black/40 rounded-lg px-3 py-2 text-white text-sm">
+                                        <span>{u.name}【{u.jockey}】</span>
+                                        <button onClick={() => handleDeleteUser(u)}
+                                            className="bg-red-600 hover:bg-red-500 text-xs font-bold px-3 py-1 rounded">
+                                            削除
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                            <div className="space-y-2 border-t border-white/10 pt-3">
+                                <div className="text-xs text-gray-400">新しい出場者を追加（初期PIN: 0000）</div>
+                                <input value={newJockey} onChange={e => setNewJockey(e.target.value)} placeholder="ジョッキー名（例: 伊藤）"
+                                    className="w-full bg-black border border-white/20 rounded-lg p-2 text-white outline-none" />
+                                <input value={newHorse} onChange={e => setNewHorse(e.target.value)} placeholder="馬名（例: イトウ）"
+                                    className="w-full bg-black border border-white/20 rounded-lg p-2 text-white outline-none" />
+                                <button onClick={handleAddUser}
+                                    className="w-full bg-white text-black font-bold py-2 rounded-lg hover:bg-gray-200">
+                                    追加
+                                </button>
+                            </div>
+                            <button onClick={() => setIsMembersOpen(false)}
+                                className="w-full bg-gray-700 text-white py-2 rounded-lg text-sm">閉じる</button>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
