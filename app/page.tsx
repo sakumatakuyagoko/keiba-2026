@@ -1,7 +1,7 @@
 "use client";
 
 import { sortUsers } from "@/lib/users";
-import { Toast } from "@/components/Toast";
+import { Toast, ToastData } from "@/components/Toast";
 import { MOCK_RACES } from "@/lib/mock";
 import { createKyotoTournament, setSavedArchives } from "@/lib/history";
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
@@ -42,7 +42,7 @@ export default function Home() {
   const [celebrationType, setCelebrationType] = useState<'win' | 'loss' | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastData | null>(null);
   const [, setArchivesVersion] = useState(0); // re-render after saved results load
   const closeToast = useCallback(() => setToast(null), []);
 
@@ -119,7 +119,19 @@ export default function Home() {
           const reporter = usersRef.current.find(u => u.id === mappedBet.userId);
           const race = MOCK_RACES.find(r => r.id === mappedBet.raceId);
           const raceName = race ? `${race.location === "Kyoto" ? "京都" : "東京"}${race.raceNumber}R` : "レース";
-          if (reporter) setToast(`🏇 ${reporter.name}さんが ${raceName} を報告！`);
+          if (reporter) {
+            // Rate only (same basis as the ranking); amounts stay private
+            const { investment, returnAmount } = mappedBet;
+            if (investment > 0 && returnAmount > investment) {
+              setToast({ kind: "win", message: `🎉 ${reporter.name}さん ${raceName} WIN ${Math.round((returnAmount / investment) * 100)}%` });
+            } else if (investment > 0 && returnAmount < investment) {
+              setToast({ kind: "lose", message: `💧 ${reporter.name}さん ${raceName} LOSE ${Math.round((returnAmount / investment) * 100)}%` });
+            } else if (investment > 0) {
+              setToast({ kind: "even", message: `😐 ${reporter.name}さん ${raceName} EVEN 100%` });
+            } else {
+              setToast({ kind: "info", message: `🏇 ${reporter.name}さんが ${raceName} を報告！` });
+            }
+          }
         }
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
