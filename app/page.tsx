@@ -16,8 +16,9 @@ import { fetchBets, fetchUsers, fetchSystemStatus } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { CelebrationOverlay } from "@/components/CelebrationOverlay";
 import { HistoryModal } from "@/components/HistoryModal";
+import { HelpModal } from "@/components/HelpModal";
 import Image from "next/image";
-import { Trophy } from "lucide-react";
+import { Trophy, HelpCircle } from "lucide-react";
 
 // Fixed Order List
 const ORDERED_JOCKEYS = [
@@ -41,6 +42,7 @@ export default function Home() {
   const [showClosedAlert, setShowClosedAlert] = useState(false);
   const [celebrationType, setCelebrationType] = useState<'win' | 'loss' | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Load User from LocalStorage on mount
   useEffect(() => {
@@ -245,6 +247,15 @@ export default function Home() {
         </h1>
         <div className="flex items-center gap-2 z-10">
           <button
+            onClick={() => setIsHelpOpen(true)}
+            className="flex items-center gap-1 px-2.5 py-2 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full transition-colors border border-white/20 text-white font-bold text-xs sm:text-sm"
+            title="使い方"
+            aria-label="使い方"
+          >
+            <HelpCircle className="w-4 h-4 text-yellow-400" />
+            <span className="hidden sm:inline">使い方</span>
+          </button>
+          <button
             onClick={() => setIsHistoryOpen(true)}
             className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-yellow-600/30 to-amber-600/30 hover:from-yellow-600/50 hover:to-amber-600/50 backdrop-blur-sm rounded-full transition-all border border-yellow-500/40 text-yellow-300 font-bold text-xs sm:text-sm shadow-md"
             title="歴代大会の記録を見る"
@@ -408,6 +419,8 @@ export default function Home() {
         type={celebrationType}
         onClose={() => setCelebrationType(null)}
       />
+
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
       <HistoryModal
         isOpen={isHistoryOpen}
