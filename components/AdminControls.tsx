@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { resetBets, updateSystemStatus, createUser, deleteUser, restoreUser, updateUserOrder, DeletedUserSnapshot } from "@/lib/api";
+import { resetBets, updateSystemStatus, updateUserPin, createUser, deleteUser, restoreUser, updateUserOrder, DeletedUserSnapshot } from "@/lib/api";
 import { User } from "@/lib/types";
 import clsx from "clsx";
 
@@ -90,6 +90,17 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
             return;
         }
         if (snapshot) rememberDeleted(snapshot);
+        await onUsersChanged?.();
+    };
+
+    const handleResetPin = async (u: User) => {
+        if (!confirm(`${u.name}【${u.jockey}】のPINを「0000」に戻しますか？\n次回ログイン時に、新しいPINを設定してもらいます。`)) return;
+        const { error } = await updateUserPin(u.id, "0000");
+        if (error) {
+            alert("PINをリセットできませんでした: " + error.message);
+            return;
+        }
+        alert(`${u.name}さんのPINを「0000」に戻しました。`);
         await onUsersChanged?.();
     };
 
@@ -204,6 +215,10 @@ export function AdminControls({ isAdmin, onLogin, onLogout, isBettingClosed = fa
                                             className="bg-gray-700 hover:bg-gray-600 disabled:opacity-30 px-2 py-1 rounded">▲</button>
                                         <button onClick={() => handleMove(i, 1)} disabled={i === users.length - 1} aria-label="下へ"
                                             className="bg-gray-700 hover:bg-gray-600 disabled:opacity-30 px-2 py-1 rounded">▼</button>
+                                        <button onClick={() => handleResetPin(u)}
+                                            className="bg-gray-700 hover:bg-gray-600 text-xs font-bold px-2 py-1 rounded whitespace-nowrap">
+                                            PIN戻す
+                                        </button>
                                         <button onClick={() => handleDeleteUser(u)}
                                             className="bg-red-600 hover:bg-red-500 text-xs font-bold px-3 py-1 rounded">
                                             削除
