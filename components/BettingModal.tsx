@@ -73,6 +73,18 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
             // Reset if opening fresh
             setInvestment("");
             setReturnAmount("");
+
+            // Preselect the latest race that has already started (race 1 if none yet)
+            const now = new Date();
+            const started = MOCK_RACES.filter(r => {
+                if (r.location !== "Kyoto" || !r.startTime) return false;
+                const [h, m] = r.startTime.split(":").map(Number);
+                const d = new Date();
+                d.setHours(h, m, 0, 0);
+                return now >= d;
+            });
+            setSelectedLocation("Kyoto");
+            setSelectedRaceNum(started.length > 0 ? Math.max(...started.map(r => r.raceNumber)) : 1);
         }
     }, [isOpen, initialData, users]);
 
@@ -320,6 +332,11 @@ export function BettingModal({ isOpen, onClose, onSubmit, isAdmin = false, initi
                                         {currentRace && (
                                             <div className="text-gray-400 text-xs mt-0.5">
                                                 {currentRace.conditions} / 発走 {currentRace.startTime}
+                                            </div>
+                                        )}
+                                        {isLocked && currentRace && (
+                                            <div className="text-yellow-400 text-xs font-bold mt-1">
+                                                🔒 {currentRace.startTime}の発走後に入力できます
                                             </div>
                                         )}
                                     </div>
